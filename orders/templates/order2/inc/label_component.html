@@ -1,0 +1,53 @@
+{% load utils %}
+{% load i18n %}
+{% load static %}
+{% load humanize %}
+
+<div class="grid-container envelope">
+    <div class="grid-item" id="label">
+        {% if label_setting.logo %}
+            <img src="{{ label_setting.logo.url }}">
+        {% endif %}
+        {{ site_url }}
+    </div>
+    <div class="grid-item" id="sender">
+        <ul>
+            <li><span class="titr">فرستنده:</span> <b>{{ label_setting.name }}</b></li>
+            <li>{{ label_setting.address }}</li>
+            <li>
+                <b>کد پستی: </b>{% if label_setting.postal_code %}
+                {{ label_setting.postal_code|persian_numbers }}{% else %}-{% endif %}
+            </li>
+            <li><b>تلفن: </b><span dir="ltr"> {{ label_setting.phone|persian_numbers }}</span></li>
+        </ul>
+    </div>
+    <div class="grid-item" id="receiver">
+        <ul>
+            <li><span class="titr">گیرنده:</span> <b>{{ order.fullname }}</b></li>
+            <li>{{ order.complete_address }}</li>
+            <li style="float: right"><b>کد پستی: </b>{% if order.postal_code %}
+                {{ order.postal_code|persian_numbers }}{% else %}-{% endif %}</li>
+            <li style="float: left"><b>تلفن: </b><span dir="ltr">{{ order.mobile_number|persian_numbers }}</span></li>
+        </ul>
+    </div>
+    <div class="grid-item" id="site">
+        <div class="order-information">
+            <div class="splitter">
+                <b>شماره سفارش: </b>
+                {{ order.tracking_code|persian_numbers }}
+            </div>
+
+            <div class="splitter">
+                {% with order.payment_method as payment_method %}
+                    <b>روش پرداخت: </b>
+                    {% if payment_method %}{{ order.get_payment_method_display }}{% else %}درگاه بانکی{% endif %}
+                {% endwith %}
+            </div>
+            {% if order.payment_method and order.payment_method == order.POST_PAID %}
+                <div class="splitter" style="font-weight: bold; border: black solid 1px;">
+                    <b>مبلغ: {{ order.get_payable_in_post_paid|persian_numbers|intcomma:False }} تومان</b>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

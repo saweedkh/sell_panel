@@ -1,0 +1,57 @@
+{% load i18n %}
+<div class="onhover-div onhover-div-login" id="user_menu">
+    <ul class="user-box-name">
+        {% if request.user.is_authenticated %}
+            <li class="product-box-contain">
+                <a href="{% url 'account:dashboard' %}"
+                   title="{% trans 'پنل کاربری' %}">{{ request.user.fullname }}</a>
+            </li>
+
+            <li class="product-box-contain">
+                <a href="{% url 'account:history' %}"
+                   title="{% trans 'تاریخچه سفارشات' %}">{% trans 'تاریخچه سفارشات' %}</a>
+            </li>
+
+            <li class="product-box-contain">
+                <a href="{% url 'account:wishlist' %}"
+                   title="{% trans 'محصولات مورد علاقه' %}">{% trans 'محصولات مورد علاقه' %}</a>
+            </li>
+
+            <li class="product-box-contain">
+                <a href="{% url 'account:bookmark' %}"
+                   title="{% trans 'لیست مطالعه' %}">{% trans 'لیست مطالعه' %}</a>
+            </li>
+
+            <li class="product-box-contain">
+                <a href="{% url 'account:logout' %}"
+                   title="{% trans 'خروج' %}">{% trans 'خروج' %}</a>
+            </li>
+        {% else %}
+            <li class="product-box-contain">
+                <a href="{% url 'account:login' %}"
+                   title="{% trans 'ورود' %}">{% trans 'ورود' %}</a>
+            </li>
+
+            <li class="product-box-contain">
+                <a href="{% url 'account:user_register' %}"
+                   title="{% trans 'ثبت نام' %}">{% trans 'ثبت نام' %}</a>
+            </li>
+
+            <li class="product-box-contain">
+                <a href="{% url 'account:user_forgot_password' %}"
+                   title="{% trans 'فراموشی رمز عبور' %}">{% trans 'فراموشی رمز عبور' %}</a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+
+
+{% comment %} <div id="product_add_comment">
+    {% with product_comment_form as comment_form %}{% include 'product/inc/comment_form.html' %}{% endwith %}
+    {% with product_reply_form as reply_form %}{% include 'product/inc/reply_form.html' %}{% endwith %}
+</div>
+
+<div id="post_add_comment">
+    {% with post_comment_form as comment_form %}{% include 'blog/inc/comment_form.html' %}{% endwith %}
+    {% with post_reply_form as reply_form %}{% include 'blog/inc/reply_form.html' %}{% endwith %}
+</div> {% endcomment %}

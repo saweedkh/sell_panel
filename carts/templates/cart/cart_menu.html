@@ -1,0 +1,51 @@
+{% load static %}
+{% load utils %}
+{% load i18n %}
+{% load humanize %}
+
+
+<div id="slidebar_cart">
+  {% comment %} <button type="button" class="close_sidebar_btn close_btn"><i class="fal fa-times"></i></button> {% endcomment %}
+  <h2 class="heading_title text-uppercase">{% trans "اقلام سبد خرید" %} - <span>{{cart.count|persian_numbers}}</span></h2>
+
+  <div class="cart_items_list" >
+    {% for item in cart.items %}
+    {% with item.variant as variant %}
+    {% with variant.product as product %}
+      <div class="cart_item gap-3">
+        <div class="item_image">
+          <a href='{{product.get_absolute_url}}'>
+          <img src="{{ product.get_image }}" style="width: 70px ; height: 70px" alt="image_not_found">
+          </a>
+        </div>
+        <a href='{{product.get_absolute_url}}'>
+        <div class="item_content">
+          <h4 class="item_title">
+              {{variant.variant_descriptor}}
+          </h4>
+          <div class="d-flex">
+              <span class="item_price">{{variant.final_price|intcomma:False|persian_numbers}} {% trans "تومان" %}</span>
+            <small class="cart_counter d-flex justify-content-center align-items-center" style="font-weight: 800;    top: 50px;left: 6px;height: 22px;color: #ffffff; min-width: 22px; font-size: 12px;line-height: 22px; position: absolute;border-radius: 45px;background-color: #c7a17a;">{{item.quantity|persian_numbers}}</small>
+          </div>
+          {% comment %} <button type="button" data-vid="{{ variant.id  }}" class="remove_btn remove-product-btn"><i class="fal fa-times"></i></button> {% endcomment %}
+          <a type="button" data-vid="{{ variant.id }}" class="remove_btn remove-product-btn"><i class="fal fa-times"></i></a>
+
+        </div>
+        </a>
+      </div>
+    {% endwith %}
+    {% endwith %}
+    {% endfor %}
+
+  </div>
+  <div class="total_price text-uppercase">
+    <span>{% trans "مجموع" %}:</span>
+    <span>{{cart.final_total_items|intcomma:False|persian_numbers}} {% trans "تومان" %}</span>
+  </div>
+  <ul class="btns_group ul_li">
+    <li><a href={% url "carts:show" %} class="btn btn_primary text-uppercase">{% trans "مشاهده سبد خرید" %}</a></li>
+    <li><a href={% url "orders:billing" %} class="btn btn_border border_black text-uppercase">{% trans "پرداخت" %}</a></li>
+  </ul>
+</div>
+
+

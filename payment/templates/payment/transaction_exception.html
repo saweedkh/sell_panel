@@ -1,0 +1,90 @@
+{% extends "payment/base.html" %}
+{% load i18n %}
+{% load static %}
+
+
+{% block title %}{% trans 'خطا در تراکنش' %}{% endblock %}
+{% block meta_description %}{% endblock %}
+{% block meta_keywords %}{% endblock %}
+
+{% block canonical %}
+    {% if page.canonical %}
+        <link rel="canonical" href="{{ page.canonical }}"/>
+    {% else %}
+        {% if request.is_secure %}
+            <link rel="canonical" href="https://{{ request.get_host }}{{ request.path }}"/>
+        {% else %}
+            <link rel="canonical" href="http://{{ request.get_host }}{{ request.path }}"/>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+
+
+{% block content %}
+
+<!-- main body - start
+================================================== -->
+<main>
+
+    <section class="contact_section sec_ptb_120 d-flex justify-content-center mt-3">
+        <div class="row container" style="width: 1000px;">
+
+            <div class="col-lg-6 contact_form  wow fadeInUp d-flex align-items-center flex-column"
+                    data-wow-delay=".1s" style="height: 450px; padding: 33px 50px">
+                <div class="row">
+                    {% comment %} <h4 class="mb-3">{% trans "سفارش شما ناموفق بود" %}</h4>
+                    <p>{% trans "و اگر مبلغی از حساب شما کسر شده است تا ۲۴ ساعت آینده به حساب شما بازمیگردد" %}</p> {% endcomment %}
+                    <p class="text-center mb-2 ">
+                                        <i class="fa fa-exclamation-circle color-red-dark fa-4x"></i>
+                                    </p>
+                                    <h2 class="color-white text-center mb-3">{% trans 'مشکلی در پرداخت وجود دارد.' %}</h2>
+                                    <p class="color-white mb-3 text-justify-box">{% trans 'متاسفانه خطایی هنگام اتصال به درگاه بانکی رخ داده است، ما در حال بررسی موضوع هستیم. لطفا دقایقی دیگر مجددا امتحان کنید یا سفارش خود را از طریق روش پرداخت دیگری تکمیل کنید.' %}</p>
+                </div>
+                <form action="#" class="mt-2">
+                    <div class="row">
+                        <div>
+                            <div class="form_item">
+                                <label>{% trans "کد رهگیری " %}:</label>
+                                <div class=" d-flex justify-content-center">
+                                    <input type="text" disabled value="{{order.tracking_code}}" id="myInput" style="width: 220px">
+                                    <span class="input-group-text btn btn_primary text-uppercase"
+                                            onclick="myFunction()" id="basic-addon1">
+                        {% trans "کپی کردن" %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-copy me-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"></path>
+                    </svg>
+                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <a href="{% url 'pages:home' %}" title="{% trans 'بازگشت به فروشگاه' %}"
+                    class="btn  w-100 btn-m font-800">
+                    {% trans 'بازگشت به فروشگاه' %}
+                </a>
+            </div>
+            <div class="col-lg-6 contact_form  wow fadeInUp d-flex justify-content-center align-items-center"
+                    data-wow-delay=".1s" style="height: 450px">
+                <img src="{% static 'images/new_photo/coffee_cups.png' %}"
+                        alt="image_not_found" data-animation="fadeInUp" data-delay=".2s" style="max-width: 300px">
+            </div>
+            <script>
+                $.toast({
+                    heading: 'Success',
+                    text: 'And these were just the basic demos! Scroll down to check further details on how to customize the output.',
+                    showHideTransition: 'slide',
+                    icon: 'success'
+                })
+            </script>
+        </div>
+    </section>
+</main>
+<!-- main body - end
+================================================== -->
+
+{% endblock content %}

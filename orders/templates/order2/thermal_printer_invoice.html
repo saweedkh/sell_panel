@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load utils %}
+{% load humanize %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans 'صورت حساب' %} {{ invoice.tracking_code }}{% endblock %}
+
+{% block custom_css %}
+    <style>
+        table, td, tr {
+            border: 1px solid black;
+        }
+
+        #printable {
+            background-color: white;
+            padding: 5px;
+            margin: 10px;
+            direction: rtl;
+            font-size: 10px;
+            color: black;
+            font-weight: 900;
+            padding-bottom: 20px
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="button-group-invoice">
+        <button id="print_invoice" class="btn theme-bg-color text-white rounded no-print-this">
+            {% trans 'دانلود / پرینت' %}
+        </button>
+    </div>
+    <div id="printable">
+        <div class="row">
+            <div class="col-6">
+                <div class="font-16">{{ global_settings.name }}</div>
+                <div class="font-14">{{ site_url }}</div>
+            </div>
+            <div class="col-6 text-end">{% if global_settings.logo and global_settings.logo.file %}
+                <img src="{{ global_settings.get_logo }}" class="thermal-print-logo">
+            {% else %}
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKUAAABICAQAAAA9+P0NAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfmBBwGDDv6tcZCAAAAAW9yTlQBz6J3mgAAAnlJREFUeNrtnN16gyAMhk2f3f8ts5PZTgzyJYSYSt6TTqX8fAsJRimVLbHh5+4OuLLbDVXHnzMD0DJWeRwosWeGeN09QidK59iAFSa408TbpdQ295kWpn7HEDcP9hpsrlSfrp0X9K9mwr97FV/pwLN9JW+TkxzQk6XkhJzox2dM8Fhhx61no1JS9bmskPwE1zUZTcJ6ek/vX0ZwM1JKM1aR0sH9rCKlAymlGXZLdDydgcVWzZ1Kga8QVAvaGm2bnVWi6YzCXC1Qqd4VWRplvJbTiD1vHLFO9kuVzWsVWyTt+PlKKyFl5RzxktJWSGlZF3yktBdSU34yHlL2hkxQqX7NEv85wddyYac/KElHsEcC/VJ8iWNgoMMVbY+V6CK4KLIxYN+m01GwKX1k9gTHMtlovpvA796C940jqSwSu3Izc6XURm6ZXEHs0tcqRy1SUos7OimDDuZe7J7t9EHrDTJhpWS+0oyU0oyU0oyU0oyU0ownSBlkaRbxTbYg0kh5glUGIYKUtRVGWqIX/HwEKfEB7FeLo9wFPBdESi4L2cqacxsJ5gLu+YkhZWsIpXM8Ay7oQS9MRIng1LTCGAD9iGOVcZZAyp7EkfLrxYwkpXQIM6VX1B1LSskQZtuwuP7XeBXGXcOeSXo4A2Eb+9b68X2zfA36esc3evbbRnrXekZ/evtjnV8psOYkZTRf+cWklGaklGZEuXGMRf0jOhBplWcK81e7zJuUska9pEkprxHkq1LKHsiWLdq2XKJzXL2DfLFdMCM4xpXF/cmcE/zMA1K/cVDtAEopefCU4JuUsoU4a5oR/Aog2Pw7kVJ2gH+OLKU0I32lGSmlGb9GK3+MPt2PFgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0wNC0yOFQwNjoxMjoyMiswMDowMNyva2wAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMDQtMjhUMDY6MTI6MjIrMDA6MDCt8tPQAAAAAElFTkSuQmCC"
+                     class="thermal-print-default-logo">
+            {% endif %}
+            </div>
+            <div class="col-6">{{ invoice.tracking_code }}</div>
+            <div class="col-6 text-end">{{ invoice.order_created|standard_jalali }}</div>
+            <hr class="m-0" style="background-color: black">
+            <div class="col-6">{{ invoice.fullname }}</div>
+            <div class="col-6 text-end" style="direction: initial">{{ invoice.mobile_number }}</div>
+        </div>
+        <table style="text-align: center;margin-left: auto;margin-right: auto">
+            <tbody>
+            <tr>
+                <td style="text-align: center;">
+                    <div style="text-align: justify;">{% trans 'ردیف' %}</div>
+                </td>
+                <td>{% trans 'محصول' %}</td>
+                <td>{% trans 'شناسه' %}</td>
+                <td>{% trans 'قیمت واحد' %}</td>
+                <td>{% trans 'تعداد' %}</td>
+                <td>{% trans 'جمع' %}</td>
+            </tr>
+            {% for item in invoice_items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.get_sku }}</td>
+                    <td>{{ item.price|intcomma:False }}</td>
+                    <td style="font-size: larger"><span {% if item.bold_quantity_in_invoice %}class="bold-invoice-item"{% endif %}>{{ item.quantity }}</span></td>
+                    <td>{{ item.total_price|intcomma:False }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="4">{% trans 'مجموع' %}</td>
+                <td>{{ invoice.total_items_number }}</td>
+                <td>{{ invoice.commodity_prices|intcomma:False }}</td>
+            </tr>
+            <tr>
+                <td colspan="3">{% if invoice.shipping_cost == 0 %}{% trans '-' %}{% else %}
+                    {{ invoice.shipping_cost|intcomma:False }}
+                    {% trans 'تومان' %}{% endif %}</td>
+            </tr>
+            {% if invoice.total_discount and invoice.total_discount != 0 and invoice.total_discount != '0' %}
+                <tr>
+                    <td colspan="3">{% trans 'تخفیف کالا ها' %}</td>
+                    <td colspan="3">{{ invoice.total_discount|intcomma:False }} {% trans 'تومان' %}</td>
+                </tr>
+            {% endif %}
+            {% if invoice.discount_amount and invoice.discount_amount != 0 and invoice.discount_amount != '0' %}
+                <tr>
+                    <td colspan="3">{% trans 'مبلغ کوپن تخفیف' %}</td>
+                    <td colspan="3">{{ invoice.discount_amount|intcomma:False }} {% trans 'تومان' %}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <td colspan="3">{% trans 'مبلغ پرداختی' %} ({{ invoice.payment_method }})</td>
+                <td colspan="3">{{ invoice.payable|intcomma:False }} {% trans 'تومان' %}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block custom_js %}
+    <script src="{% static 'firefly/js/printThis.js' %}"></script>
+    <script src="{% static 'order/js/print.js' %}"></script>
+{% endblock %}

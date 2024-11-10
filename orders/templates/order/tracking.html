@@ -1,0 +1,48 @@
+{% extends 'fa_base.html' %}
+
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans 'پیگیری سفارش' %}{% endblock %}
+
+{% block content %}
+<!-- main body - start
+================================================== -->
+<main>
+
+<section class="contact_section sec_ptb_120 d-flex justify-content-center " style="margin-top: 100px">
+    <div class="row container" style="width: 1000px;">
+
+    <div class=" contact_form bg_white  wow fadeInUp d-flex align-items-center" data-wow-delay=".1s">
+        <form class="row" method="POST">
+            
+            {% csrf_token %}
+        <h3 class="d-flex justify-content-center mb-2">{% trans 'پیگیری سفارش' %}</h3>
+        <h4 class="d-flex justify-content-center mb-2">{% trans 'برای پیگیری سفارش، کد رهگیری و شماره تلفن سفارش خود را وارد کنید.' %}</h4>
+        {% include 'inc/messages.html' %}   
+        <div class="col-6 mt-3 form_item">
+            {{ form.tracking_code|as_crispy_field }}
+        </div>
+        <div class="col-6 mt-3 form_item">
+            {{ form.mobile_number|as_crispy_field }}
+            <small>{% trans 'این شماره تلفن باید با شماره ای که درهنگام ثبت سفارش وارد کرده اید یکسان باشد.' %}</small>
+        </div>
+
+        <div class="flex-row text-center mt-4">
+            <button class="btn btn_primary text-uppercase">
+                {% trans 'جستجو' %}
+            </button>
+        </div>
+
+        </form>
+    </div>
+    </div>
+</section>
+</main>
+<!-- main body - end
+================================================== -->
+{% endblock content%}
+
+
+{% block footer %}{% endblock footer %}

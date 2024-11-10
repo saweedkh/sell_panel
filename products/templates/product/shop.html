@@ -1,0 +1,133 @@
+{% extends "fa_base.html" %}
+
+{% load static %}
+{% load utils %}
+{% load humanize %}
+{% load i18n %}
+
+
+{% block content %}
+
+<main>
+
+    <!-- cart_sidebar - start
+    ================================================== -->
+    {% include "inc/fa-cart_slidbar.html" %}
+
+    <!-- cart_sidebar - end
+    ================================================== -->
+
+    <!-- breadcrumb_section - start
+    ================================================== -->
+    {% include "inc/fa-breadcrumb_section.html" with page_name="فروشگاه" %}
+
+    <!-- breadcrumb_section - end
+    ================================================== -->
+
+    <!-- shop_section - start
+    ================================================== -->
+    <section class="shop_section sec_ptb_120 bg_default_gray">
+        <div class="container">
+            <ul class="filters-button-group ul_li_center wow fadeInUp" data-wow-delay=".1s">
+                <li><button class="button text-uppercase active" data-filter="*">{% trans "همه" %}</button></li>
+                {% for category in categories %}
+                <li><button class="button text-uppercase" data-filter=".{{category.id}}">{{category.name}}</button></li>
+                {% endfor %}
+            </ul>
+
+            <div class="shop_filter_bar">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <form action="#">
+                            <div class="pricing_range wow fadeInUp" data-wow-delay=".2s">
+                                <h4 class="item_title text-uppercase ms-3">{% trans "حدود قیمت" %}</h4>
+                                <div class="price-range-area">
+                                    <div id="slider-range" class="slider-range"></div>
+                                    <div class="price-text d-flex align-items-center">
+                                        <span>{% trans "قیمت" %}:</span>
+                                        <input type="text" id="amount" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="shop_filter_tags wow fadeInUp" data-wow-delay=".1s">
+                            <h4 class="item_title text-uppercase">{% trans "برچسب محبوب" %}
+                            </h4>
+                            <ul class="ul_li me-2">
+                                <li><a href="#!">جدید</a></li>
+                                <li><a href="#!">بالا</a></li>
+                                <li><a href="#!">فروش</a></li>
+                                <li><a href="#!">قهوه</a></li>
+                                <li><a href="#!">دانه</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop_filter_grid grid wow fadeInUp" data-wow-delay=".3s">
+            {% for product in products %}
+                {% with product.default_variant as variant %}
+                    <div class="element-item  {% for cat in product.category.all %}{{cat.id}}{% endfor %}" data-category={{product.category.0}}>
+                        <div class="shop_card">
+                            <a class="wishlist_btn" href="#!"><i class="fal fa-heart"></i></a>
+                            {% with product.badge as badge %}
+                                {% if badge %}
+                                    <div class="share_btns">
+                                        <div class="custom-badge z-2">
+                                            <button class= "btn btn-danger">{{ badge.name }}</button>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+
+                            <a class="item_image" href="{{product.get_absolute_url}}">
+                                <img src={{product.get_image}} alt="{{product.name}}" style='width: 350px ; height: 300px;'>
+                            </a>
+                            <div class="item_content">
+                                <h3 class="item_title text-uppercase">
+                                    <a href="{{product.get_absolute_url}}">{{product.name}}</a>
+                                </h3>
+                            
+                            {% if product.in_stock and not product.is_variable %}
+                                <div class="add-to-cart-box qty__container col-12 mx-auto btns_group">
+                                    <button class="btn btn-add-cart addcart-button buy-product-btn btn_border border_black text-uppercase"
+                                            data-variant="quantity-{{ variant.id }}"
+                                            data-vid="{{variant.id}}"
+                                            data-product-name="{{ product.name }}">{% trans 'افزودن به سبد خرید' %}
+                                        </button>
+                                    <span class="item_price bg_default_brown">{{variant.final_price|intcomma:False|persian_numbers}} تومان</span>
+
+                                </div>
+
+                            {% elif product.in_stock and product.is_variable %}
+                                <div class="add-to-cart-box qty__container col-12 mx-auto btns_group">
+                                    <button class="btn btn-add-cart addcart-button buy-product-btn btn_border border_black text-uppercase"
+                                            data-pid="{{ product.id }}"
+                                            data-vid="{{variant.id}}">
+                                        {% trans 'افزودن به سبد خرید' %}
+                                    </button>
+                                    <span class="item_price bg_default_brown">{{variant.price|intcomma:False|persian_numbers}} تومان</span>
+                                </div>
+                                <div class="variants-container container-{{ product.id }}"></div>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+            </div>
+            <!-- Pagonation section -->
+            {% include "inc/pagination.html" %}
+        </div>
+    </section>
+    <!-- shop_section - end
+    ================================================== -->
+
+  </main>
+
+{% endblock content %}
+

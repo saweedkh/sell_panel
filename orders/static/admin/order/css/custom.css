@@ -1,0 +1,15 @@
+td.field-postal_tracking_code input {
+    width: 10em !important;
+}
+
+ul.messagelist > li.alert.alert-warning {
+    background-color: #ffc107 !important;
+    font-weight: bolder !important;
+    font-size: 15px !important;
+    background-image: none;
+    text-align: center;
+}
+
+ul.messagelist > li.alert.alert-warning > a {
+    text-decoration: revert;
+}

@@ -1,0 +1,65 @@
+{% extends "fa_base.html" %}
+
+{% load static %}
+{% load utils %}
+{% load humanize %}
+{% load i18n %}
+
+
+{% block content %}
+
+<main>
+
+    <!-- cart_sidebar - start
+    ================================================== -->
+    {% include "inc/fa-cart_slidbar.html" %}
+
+    <!-- cart_sidebar - end
+    ================================================== -->
+
+    <!-- breadcrumb_section - start
+    ================================================== -->
+    <section class="breadcrumb_section text-uppercase" style="background-image: url({% static 'images/breadcrumb/latte-coffee-cup_1203-6548.png' %});">
+        {% include "inc/fa-breadcrumb_section.html" with page_name="فروشگاه آنلاین" %}
+    </section>
+
+    <!-- breadcrumb_section - end
+    ================================================== -->
+
+    <!-- shop_section - start
+    ================================================== -->
+    <section class="shop_section sec_ptb_120 bg_default_gray" id='shop_section'>
+        <div class="container">
+            <ul class="filters-button-group ul_li_center wow fadeInUp" data-wow-delay=".1s">
+                <li><a href='{% url "products:categories" %}'><button class="button text-uppercase" data-filter="*">{% trans "همه" %}</button></a></li>
+                {% for cat in categories %}
+                <li><a href='{% url "products:category" cat.slug %}'><button class="button text-uppercase {% if cat.id == category.id %}active{% endif %}" data-filter=".{{cat.id}}">{{cat.name}}</button></a></li>
+                {% endfor %}
+            </ul>
+
+            <div class="shop_filter_grid grid wow fadeInUp" data-wow-delay=".3s">
+
+            <!-- products cart -->
+            {% include "product/cart/products-cart.html" with class='element-item' %}
+
+            {% if not products %}
+                <div class="d-flex justify-content-center" data-category={{product.category.0}}>
+                    <div class="shop_card w-50">
+                        <span style='display: flex; align-items: center; justify-content: center; height: 100%;'>{% trans "محصولی یافت نشد" %}</span>
+                    </div>
+                </div>
+            {% endif %}
+
+
+            </div>
+            <!-- Pagonation section -->
+            {% include "inc/pagination.html" %}
+        </div>
+    </section>
+    <!-- shop_section - end
+    ================================================== -->
+
+  </main>
+
+{% endblock content %}
+

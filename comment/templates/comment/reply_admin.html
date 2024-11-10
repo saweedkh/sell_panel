@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load crispy_forms_filters %}
+{% load i18n %}
+
+{% block content %}
+    <div class="dashboard">
+        <div id="content">
+            <h1>{% trans 'پاسخ' %}</h1>
+            <div id="content-main">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="submit-row">
+                        <input type="submit" class="submit-reply-admin" value="{% trans 'ثبت پاسخ' %}" name="_addanother">
+                    </div>
+                </form>
+
+            </div>
+
+            <div id="content-related" class="custom-reply">
+                <div class="module" id="recent-actions-module">
+                    <h2 class="custom-reply-name">{{ comment.name }}</h2>
+                    <h3 class="custom-date-name">{{ comment.created|date }}</h3>
+
+                    <ul class="actionlist">
+                        <p>{{ comment.review }}</p>
+                    </ul>
+
+                </div>
+            </div>
+            <br class="clear">
+        </div>
+    </div>
+{% endblock %}
+

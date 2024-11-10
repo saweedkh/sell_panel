@@ -1,0 +1,381 @@
+{% extends "fa_base.html" %}
+
+{% load static %}
+{% load utils %}
+{% load i18n %}
+{% load humanize %}
+{% load crispy_forms_tags  %}
+
+{% block content %}
+
+<main>
+
+    <!-- cart_sidebar - start
+    ================================================== -->
+    {% include "inc/fa-cart_slidbar.html" %}
+
+    <!-- cart_sidebar - end
+    ================================================== -->
+
+    <!-- breadcrumb_section - start
+    ================================================== -->
+
+    <section class="breadcrumb_section text-uppercase" style="background-image: url({% static 'images/breadcrumb/high-angle-shot-coffee-beans-jars-breakfast-table-with-some-pastry.png' %});">
+        {% include "inc/fa-breadcrumb_section.html" with page_name=product.name  %}
+    </section>
+
+    <!-- breadcrumb_section - end
+    ================================================== -->
+
+    <!-- details_section - start
+    ================================================== -->
+    <section class="details_section shop_details sec_ptb_120 bg_default_gray">
+        <div class="container">
+
+            <div class="row justify-content-lg-between justify-content-md-center justify-content-sm-center">
+                <div class="col-lg-6 col-md-7" style="direction: ltr;">
+                    <div class="details_image_wrap wow fadeInUp" data-wow-delay=".1s">
+                        <div class="details_image_carousel">
+                            {% for gallery_image in product_gallery %}
+                                <div class="slider_item">
+                                    <img src={{gallery_image.0.get_image}} alt="image_not_found" class='product_image_size'>
+                                </div>
+
+                            {% empty %}
+                                <div class="slider_item">
+                                    <img src={{product.get_image}} alt="image_not_found" class='product_image_size'>
+                                </div>
+                            
+                            {% endfor %}
+                        </div>
+
+                        <div class="details_image_carousel_nav">
+                            {% for gallery_image in product_gallery %}
+                                <div class="slider_item">
+                                    <img src={{gallery_image.0.get_image}} alt="image_not_found" class='product_image_size'>
+                                </div>
+                            {% empty %}
+                            <div class="slider_item">
+                                <img src={{product.get_image}} alt="image_not_found" class='product_image_size'>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-7 ">
+                    <div class="details_content wow fadeInUp"  data-wow-delay=".2s">
+                        <div class="details_flex_title me-sm-0 me-md-5 me-lg-0">
+                            <h2 class="details_title text-uppercase">{{product.name}} </h2>
+                            
+                        </div>
+                        
+
+                        
+                        <div id="product-price">
+                            {% if variant and variant.in_stock_status %}
+                                <p class="details_price me-3 gap-3">                                
+                                    <strong class="price_text">{{ variant.final_price|intcomma:False|persian_numbers }} {% trans "تومان" %}</strong>
+                                    {% if variant.has_discount %}
+                                        <del class="text-content">{{ variant.price_before_discount|intcomma:False|persian_numbers }}</del>
+                                        <span class="offer theme-color">({{ variant.discount_percent|persian_numbers }}% {% trans 'تخفیف' %})</span>
+                                    {% endif %}
+                                    <span class="in_stuck"><i class="fal fa-check"></i></span><span class="offer theme-color"> {% trans "در انبار" %}</span>
+                                </p>
+                            {% endif %}
+                        </div>
+                        <p class="me-lg-5">
+                            <div class="product-contain content-image content-font-md-16 editor-section product-short-description"
+                                    id="product-detail">
+                                    <div class="me-md-5">
+                                        {{ product.get_short_description|safe }}
+                                    </div>
+                            </div>
+                        </p>
+
+                        {% if product.type == product.VARIABLE %}
+                            <div class="product-packege product-contain">
+                                {% if not select_attribute_form.have_problem_in_variation %}
+                                    <div class="me-5 mb-3" style="width:200px;">
+                                        {% crispy select_attribute_form %}
+                                    </div>
+                                {% else %}
+                                    <p class="alert alert-warning m-3">
+                                        {% trans 'لطفا قبل از سفارش این محصول، تماس بگیرید.' %}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div id="product-buy-section">
+                        <div class="note-box product-packege flex-column row">
+                            {% if variant and variant.in_stock_status %}
+                                <ul class="btns_group ul_li gap-lg-0 gap-2">
+                                    <li class= "d-flex">
+                                        
+                                        <div class="quantity_input quantity_boxed gap-3 ps-lg-5  d-flex me-0 me-md-4" style= " width : 200px ; height: 60px">
+                                            <h4 class="quantity_title text-uppercase">{% trans "تعداد" %}</h4>
+                                                <button type="button" data-vid="{{ variant.id }}" class="change_input_number me-1" data-type='minus'>–</button>
+                                                <input class="input_number quantity-input input-number qty-input disable-click input-{{variant.id}} quantity-{{variant.id}} quantityInput"  
+                                                name='quantity' type="text" value="{% if variant.order_limit_min %}{{variant.order_limit_min}}{% else %}1{% endif %}"
+                                                data-vid="{{ variant.id }}" 
+                                                data-product-name="{{ product.name }}"
+                                                data-min="{{ variant.order_limit_min }}"
+                                                data-max="{{ variant.order_limit_max }}"
+                                                >
+                                                <button type="button" data-vid="{{ variant.id }}" class="change_input_number" data-type='plus'>+</button>
+                                        </div>
+
+                                        <div class= "d-flex justify-content-center gap-1">
+                                            <button class="btn btn_secondary text-uppercase me-3 cart-button text-white buy-product-btn add_item" style= " height: 60px"
+                                                    data-vid="{{ variant.id }}"
+                                                    data-product-url="{{ product.get_absolute_url }}"
+                                                    data-product-name="{{ product.name }}">
+                                                {% trans 'افزودن به سبد خرید' %}
+                                            </button>
+
+
+                                            {% with product.get_consider_before_buying as consider_before_buying %}
+                                            {% if consider_before_buying %}
+
+                                            <button class="btn btn-md btn_primary cart-button text-black  
+                                            btn text-uppercase"
+                                            style= " height: 60px"
+                                                    type="button" data-bs-toggle="modal"
+                                                    data-bs-target="#consider_before_buying">
+                                                <span class="d-sm-block">{% trans 'نکات قبل از خرید' %}</span>
+                                            </button>
+                                            {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                    
+                                    </li>
+                                
+                                </ul>
+
+                                
+                            {% else %}
+                                <div class="alert alert-danger w-100 text-center" role="alert">
+                                    {% trans 'متاسفانه این محصول در انبار موجود نیست.' %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    
+                        <div class="details_wishlist_btn me-md-5">
+                            <button class="add_wishlist custom-wishlist-button font-14 pt-0 d-flex gap-1 align-items-center  me-0"
+                                    data-add-wishlist-url="{{ product.add_wishlist_absolute_url }}"
+                                    data-product-name="{{ product.name }}">
+                                    <i class="fas fa-heart mr-1"></i>
+                                <span>{% trans 'افزودن به لیست علاقه مندی ها' %}</span>
+                            </button>
+                        </div>
+
+                        
+                        {% comment %} <div class="details_share_links me-md-5">
+                            <button class="custom-wishlist-button font-14 pt-0 list_title" data-menu="menu-share">
+                                <i class="fas fa-share mr-1"></i>
+                                <span>{% trans 'اشتراک گذاری' %}</span>
+                            </button>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Brand -->
+            <!-- <div class="col-xxl-3 col-xl-4 col-lg-5 d-none d-lg-block wow fadeInUp">
+                <div class="right-sidebar-box">
+                    {% with product.brand as brand %}
+                        {% if brand and brand.page_display_status == brand.PUBLISH %}
+                            {% comment %} {% include 'product/inc/product_brand.html' %} {% endcomment %}
+                            <div class="vendor-box">
+                                <div class="verndor-contain justify-content-between">
+                                    <div class="vendor-name">
+                                        <h4 class="fw-bold">{{ brand.name }}</h4>
+                                    </div>
+                                    <div class="vendor-image">
+                                        <img src="{{ brand.get_image }}" loading="lazy"
+                                             alt="{{ brand.name }}">
+                                    </div>
+                                </div>
+                            
+                                <div class="vendor-detail pb-0 border-bottom-0 editor-section">{{ brand.description|safe }}</div>
+                            </div>
+                        {% endif %}
+
+                        
+                    {% endwith %}
+                </div>
+            </div> -->
+
+            <div class="product_description_wrap wow fadeInUp" data-wow-delay=".3s">
+                <ul class="tabs_nav ul_li nav" role="tablist">
+                    <li>
+                        <button class="active" data-bs-toggle="tab" data-bs-target="#product_description" type="button" role="tab" aria-selected="true">{% trans "جزئیات محصول" %}</button>
+                    </li>
+                    <li>
+                        <button data-bs-toggle="tab" data-bs-target="#product_additional_info" type="button" role="tab" aria-selected="false">{% trans "مشخصات محصول" %}</button>
+                    </li>
+                    {% comment %} <li>
+                        <button data-bs-toggle="tab" data-bs-target="#product_review" type="button" role="tab" aria-selected="false">{% trans "بررسی" %} ({{product.get_comment_count}})</button>
+                    </li> {% endcomment %}
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="product_description" role="tabpanel">
+                        <p class="mb-0">
+                            {{product.content|safe}}
+                        </p>
+                    </div>
+                    <div class="tab-pane fade" id="product_additional_info" role="tabpanel">
+                        <p class="mb-0">
+
+                            {% if product_specifications %}
+                            
+                                <table class="table info-table">
+                                    <tbody>
+                                        {% with product_specifications as specials_product_specifications %}
+                                        {% for product_specification in specials_product_specifications %}
+                                        <tr>
+                                            <td style="color: #ffff">
+                                                {{ product_specification.general_attribute.name }}
+                                            </td>
+                                            <td style="color: #ffff">
+                                                {% for attr_value in product_specification.attribute_value.all %}
+                                                {% if not forloop.last %}
+                                                {{ attr_value.name }} |
+                                                {% else %}
+                                                {{ attr_value.name }}
+                                                {% if product_specification.custom_attribute_value %}
+                                                |
+                                                {{ product_specification.custom_attribute_value }}
+                                                {% endif %}
+                                                {% endif %}
+                                                {% empty %}
+                                                {% if product_specification.custom_attribute_value %}
+                                                {{ product_specification.custom_attribute_value }}
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% endwith %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                {% trans "ویژگی ای یافت نشد!" %}
+
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% comment %} <div class="tab-pane fade" id="product_review" role="tabpanel">
+                        <p class="mb-0">
+                           تنظیم نشده</p>
+                    </div> {% endcomment %}
+                </div>
+            </div>
+
+            {% with product.get_consider_before_buying as consider_before_buying %}
+            {% if consider_before_buying %}
+                <div class="modal fade theme-modal" id="consider_before_buying"  tabindex="-1"
+                    aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" >
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #232323">
+                                <h5 class="modal-title " id="exampleModalLabel1">{% trans 'نکات قبل از خرید' %}
+                                    "{{ product.name }}"</h5>
+                                <button type="button" class=" btn btn-close mx-5" style="background-color: #ffff" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-xmark" ></i>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="background-color: #232323">
+                                {{ consider_before_buying|safe }}
+                            </div>
+                            <div class="modal-footer" style="background-color: #232323">
+                                <button id="consider_before_buying_confirm" type="button"
+                                        class="btn btn-md close-address-modal btn-secondary"
+                                        data-bs-dismiss="modal">{% trans 'تایید' %}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% endwith %}
+
+
+            {% if product.get_related_products %}
+            
+            <div class="related_products">
+                <h4 class="area_title text-uppercase mb-0 wow fadeInUp" data-wow-delay=".1s">{% trans "محصولات مرتبط" %}</h4>
+                <div class="row">
+                    {% with product.get_related_products as products %}
+                    {% include "product/cart/products-cart.html" with class='element-item col-lg-4 col-md-6 col-sm-6' %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            {% endif %}
+
+        </div>
+    </section>
+    <!-- details_section - end
+    ================================================== -->
+
+  </main>
+
+{% endblock content %}
+
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'firefly/js/slick/slick.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/slick/slick-animation.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/custom-slick-animated.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/slick/custom_slick.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/quantity-2.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/quantity-3.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/jquery.elevatezoom.js' %}"></script>
+    <script type="text/javascript" src="{% static 'firefly/js/zoom-filter.js' %}"></script>
+    <script type="text/javascript" src="{% static 'product/js/fix_slider.js' %}"></script>
+    <script type="text/javascript">
+        function canShowModal() {
+            const lastConfirmationTimestamp = localStorage.getItem('lastConfirmationTimestamp-{{ product.pk }}');
+            if (!lastConfirmationTimestamp) {
+                return true;
+            }
+            const twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+            const currentTime = new Date().getTime();
+            const timeDifference = currentTime - parseInt(lastConfirmationTimestamp, 10);
+            return timeDifference >= twentyFourHoursInMillis;
+        }
+
+        $(window).on('load', function () {
+            var consider_before_buying_modal = $('#consider_before_buying');
+            if (consider_before_buying_modal.length > 0 && canShowModal()) {
+                consider_before_buying_modal.modal('show');
+            }
+        });
+        $('#consider_before_buying_confirm').on('click', function () {
+            const currentTime = new Date().getTime();
+            localStorage.setItem('lastConfirmationTimestamp-{{ product.pk }}', currentTime.toString());
+            $('#consider_before_buying').modal('hide');
+        });
+    </script>
+    <script>
+        function toggleDescription(e) {
+            var description = document.getElementById("productDescription");
+            var text = document.getElementById('showMoreText');
+            var show_more_arrow = document.getElementById("showMoreArrow");
+            description.classList.toggle("expanded");
+            show_more_arrow.classList.toggle("show-more-arrow");
+            if (description.classList.contains('expanded')) {
+                text.innerHTML = "مشاهده کمتر";
+            } else {
+                text.innerHTML = "مشاهده بیشتر";
+            }
+        }
+    </script>
+{% endblock %}

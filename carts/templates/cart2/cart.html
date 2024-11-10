@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% load carton_tags %}
+{% load static %}
+
+{% block title %}{% trans 'سبد خرید' %}{% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{% static 'firefly/css/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% get_cart as cart %}
+    <section class="breadscrumb-section pt-0">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadscrumb-contain">
+                        <h2>{% trans 'سبد خرید' %}</h2>
+                        <nav>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'pages:home' %}" title="{% trans 'بازگشت به فروشگاه' %}">
+                                        <i class="fa-solid fa-house"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">{% trans 'سبد خرید' %}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cart-section section-b-space">
+        <div class="container-fluid-lg">
+            <div id="cart_items" class=" shopping-cart__container row g-sm-5 g-3">
+                {% if not cart.is_empty %}
+                    <div class="col-xxl-9 custom__products">
+                        {% include 'inc/messages.html' %}
+
+                        {% for item in cart.items %}
+                            {% with item.variant as variant %}
+                                {% with variant.product as product %}
+                                    <div class="product__container product-card" id="cart-item-{{ variant.id }}"
+                                         data-vid="{{ variant.id }}">
+                                        <span class="remove-product remove-product-btn">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                        </span>
+                                        <div class="product__main">
+                                            <div class="product__main-div">
+                                                <a href="{{ product.get_absolute_url }}" class="product-image"
+                                                   title="{{ product.name }}">
+                                                    {% if variant.image %}
+                                                        <img src="{{ variant.get_image }}" alt="{{ product.name }}" loading="lazy"/>
+                                                    {% else %}
+                                                        <img src="{{ product.get_image }}" alt="{{ product.name }}" loading="lazy"/>
+                                                    {% endif %}
+                                                </a>
+                                                <div class="product__info">
+                                                    <div class="name">
+                                                        <a href="{{ product.get_absolute_url }}"
+                                                           title="{{ product.name }}">{{ variant.product_name }}</a>
+                                                    </div>
+                                                    {% if variant.variant_name %}
+                                                        <div class="text-content">
+                                                            <span class="text-title">{{ variant.variant_name }}</span>
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <div class="price text-content">
+                                                        <span class="text-title">{% trans 'قیمت واحد' %} : </span>
+                                                        <span class="product-new-price">
+									                        {{ variant.price_after_discount|intcomma:False }}
+                                                            {% if variant.has_discount %}
+                                                                <span class="text-content blur-on-change"
+                                                                      style="align-self: flex-start">{% trans 'تخفیف' %} : {{ variant.discount|intcomma:False }}</span>
+                                                            {% endif %}
+											            </span>
+                                                    </div>
+
+                                                    <div class="price text-content">
+                                                        <span class="text-title">{% trans 'جمع کل' %}: </span>
+                                                        <span class="product-new-price blur-on-change">
+												            {{ item.subtotal|intcomma:False }}
+											            </span>
+                                                    </div>
+
+                                                    <div class="qty__container">
+                                                        <div class="quantity-price">
+                                                            <div class="cart_qty">
+                                                                <div class="input-group">
+                                                                    <button type="button"
+                                                                            class="btn qty-left-minus theme-color"
+                                                                            data-type="minus" data-field="">
+                                                                        <i class="fa fa-minus ms-0"
+                                                                           aria-hidden="true"></i>
+                                                                    </button>
+                                                                    <input class="form-control input-number qty-input theme-color disable-click"
+                                                                           type="text" name="quantity"
+                                                                           data-vid="{{ variant.id }}"
+                                                                           min="{{ variant.order_limit_min }}"
+                                                                           max="{{ variant.order_limit_max }}"
+                                                                           value="{{ item.quantity }}"
+                                                                           id="quantity-{{ variant.id }}">
+                                                                    <button type="button"
+                                                                            class="btn qty-right-plus theme-color"
+                                                                            data-type="plus" data-field="">
+                                                                        <i class="fa fa-plus ms-0"
+                                                                           aria-hidden="true"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="col-xxl-3" id="invoice-section">
+                        <div class="summery-box p-sticky">
+                            <div class="summery-header">
+                                <h3>{% trans 'صورت حساب' %}</h3>
+                            </div>
+                            <div class="update blur-on-change">
+                                <div class="summery-contain">
+                                    <ul>
+                                        <li>
+                                            <h4>{% trans 'مبلغ کل کالاها' %}</h4>
+                                            <h4 class="price">{{ cart.total_items|intcomma:False }} {% trans 'تومان' %}</h4>
+                                        </li>
+
+                                        <li>
+                                            <h4>{% trans 'جمع سبد خرید' %}</h4>
+                                            <h4 class="price">{{ cart.final_total_items|intcomma:False }} {% trans 'تومان' %}</h4>
+                                        </li>
+                                        {% if cart.total_profit_cart_page %}
+                                            <li>
+                                                <h4>{% trans 'سود شما از خرید' %}</h4>
+                                                <h4 class="price text-danger">
+                                                    (%{{ cart.profit_percent_cart_page }}) {{ cart.total_profit_cart_page|intcomma:False }} {% trans 'تومان' %}</h4>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                                <ul class="summery-total">
+                                    <li class="list-total border-top-0">
+                                        <h4>{% trans 'قابل پرداخت' %}</h4>
+                                        <h4 class="price theme-color">{{ cart.payable_cart_page|intcomma:False }} {% trans 'تومان' %}</h4>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="button-group cart-button">
+                                <ul>
+                                    <li>
+                                        <a href="{% url 'order:billing' %}" title="{% trans 'ادامه جهت تسویه حساب' %}"
+                                           style="font-size: 14px"
+                                           class="btn btn-animation btn-theme-color proceed-btn fw-bold">{% trans 'ادامه جهت تسویه حساب' %}
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="{% url 'pages:home' %}" title="{% trans 'بازگشت به فروشگاه' %}"
+                                           class="btn btn-light shopping-button text-dark" style="font-size: 14px">
+                                            <i class="fa-solid fa-arrow-right-long"></i>{% trans 'بازگشت به فروشگاه' %}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <h3 class="text-center">{% trans 'سبد خرید شما خالی است!' %}</h3>
+                    <div class="button-group">
+                        <a href="{% url 'pages:home' %}" title="{% trans 'بازگشت به فروشگاه' %}"
+                           class="btn btn-sm btn-animation btn-theme-color btn-center">{% trans 'بازگشت به فروشگاه' %}</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block custom_js %}
+    <script type="text/javascript" src="{% static 'firefly/js/quantity.js' %}"></script>
+{% endblock %}

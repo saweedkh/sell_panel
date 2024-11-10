@@ -1,0 +1,213 @@
+{% extends "fa_base.html" %}
+
+{% load crispy_forms_filters %}
+{% load humanize %}
+{% load utils %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+{{page_title}}
+{% endblock title %}
+
+
+{% block body_style %}{% endblock body_style %}
+{% block breadcrumb_section %}{% endblock breadcrumb_section %}
+{% block header %}{% endblock header %}
+
+{% block content %}
+
+<body class="d-flex justify-content-center align-items-center p-5">
+	
+	<div class="d-block justify-content-center align-items-center" style="width: 820p; padding: 15px;">
+			<div class="row" >
+				<div class="col d-flex justify-content-start">
+					{% if global_settings.logo %}
+					<img src="{{global_settings.get_logo}}" style="width: 130px; height: 60px; 
+							background-color:black; padding: 7px; 
+							border: 2px solid #555; border-radius:10px">
+					{% endif %}
+				</div>
+				<div class="col d-flex justify-content-end">
+					<h3 class="onvan">{{global_settings.name}}</h3>
+				</div>
+			</div>
+
+		    <div class="row mt-5">
+
+				<table class="table border">
+					<thead>
+					<tr style="color: #c7a17a ">
+						<th>{% trans "شماره پیگیری" %}</th>
+						<th>{% trans "زمان ثبت سفارش" %}</th>
+						<th>{% trans "روش پرداخت" %}</th>
+						<th>{% trans "روش ارسال" %}</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr class="fw-bolder text-dark">
+						<td>{{invoice.tracking_code|persian_numbers}}</td>
+						<td>{{ invoice.order_jcreated|persian_numbers }}</td>
+						<td>{{ invoice.payment_method }}</td>
+					</tr>
+					</tbody>
+				</table>
+
+			</div>
+
+		<div class="row mt-3">
+			<div class=" wow fadeInUp" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<h6 class="onvan">{% trans "نام" %}: </h6>
+					<P class="me-2 text-dark">{{invoice.fullname}}</P>
+				</div>
+
+			</div>
+
+			<div class=" wow fadeInUp" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<h6 class="onvan">{% trans "شماره تلفن" %}: </h6>
+					<P class="me-2 text-dark" style="direction:ltr">{{invoice.mobile_number|persian_numbers}}</P>
+				</div>
+
+			</div>
+
+			<div class=" wow fadeInUp" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<h6 class="onvan">{% trans "آدرس" %}: </h6>
+					<P class="me-2 text-dark">{{invoice.complete_address}}</P>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="row mt-5">
+
+			<table class="table border">
+				<thead>
+				<tr style="color: #c7a17a ">
+					<th>#</th>
+					<th>{% trans "محصول" %}</th>
+					<th>{% trans "شناسه" %}</th>
+					<th>{% trans "قیمت واحد" %}</th>
+					<th>{% trans "تعداد" %}</th>
+					<th>{% trans "قیمت کل" %}</th>
+				</tr>
+				</thead>
+				<tbody>
+                {% for item in invoice_items %}
+                    <tr class="fw-bolder price_text1">
+                        <td>{{forloop.counter|persian_numbers}}</td>
+                        <td>{{item.product}}</td>
+                        <td>{{item.variant_id|persian_numbers}}</td>
+                        <td><span style='font-size: 15px;'>{{item.price_after_discount|intcomma:False|persian_numbers}}</span>{% if item.has_discount %} <span class='takhfif' style="color: #c7a17a ">{{item.price_before_discount|intcomma:False|persian_numbers}} </span>  <span style="color: #c7a17a " >({{item.discount_percent|persian_numbers}}% {% trans "تخفیف" %})</span>{% endif %}</td>
+                        <td>{{item.quantity|persian_numbers}}</td>
+                        <td>{{item.amount_payable|intcomma:False|persian_numbers}}</td>
+                    </tr>
+                
+                {% endfor %}
+                    
+				</tbody>
+			</table>
+
+		</div>
+
+		<div class="row mt-3">
+			<div class=" wow fadeInUp" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<div class="col">
+						<h6 class="onvan">{% trans "تعداد کل کالا ها" %}: </h6>
+					</div>
+					<div class="col d-flex justify-content-end" >
+						<P class="me-2 jvab">{{ invoice.total_items_number|persian_numbers }} {% trans 'عدد' %}</P>
+					</div>
+				</div>
+
+			</div>
+
+			<div class=" wow fadeInUp" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<div class="col">
+						<h6 class="onvan">{% trans "مجموع قیمت کالاها" %}: </h6>
+					</div>
+					<div class="col d-flex justify-content-end" >
+						<P class="me-2 jvab">{{ invoice.commodity_prices|intcomma:False|persian_numbers }} {% trans 'تومان' %}</P>
+					</div>
+				</div>
+
+			</div>
+
+			{% if invoice.total_discount and invoice.total_discount != '0' %}
+
+				<div class=" wow fadeInUp" data-wow-delay=".3s">
+					<div class=" d-flex">
+						<div class="col">
+							<h6 class="onvan">{% trans 'تخفیف کالا ها' %}: </h6>
+						</div>
+						<div class="col d-flex justify-content-end" >
+							<P class="me-2 jvab">{{ invoice.total_discount|intcomma:False|persian_numbers }} {% trans 'تومان' %}</P>
+						</div>
+					</div>
+	
+				</div>
+			{% endif %}
+			{% if invoice.discount_amount and invoice.discount_amount != '0' %}
+
+				<div class=" wow fadeInUp" data-wow-delay=".3s">
+					<div class=" d-flex">
+						<div class="col">
+							<h6 class="onvan">{% trans 'مبلغ کوپن تخفیف' %}: </h6>
+						</div>
+						<div class="col d-flex justify-content-end" >
+							<P class="me-2 jvab">{{ invoice.discount_amount|intcomma:False|persian_numbers }} {% trans 'تومان' %}</P>
+						</div>
+					</div>
+	
+				</div>
+			{% endif %}
+
+			<div class=" wow fadeInUp" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<div class="col">
+						<h6 class="onvan">{% trans "هزینه ارسال" %}: </h6>
+					</div>
+					<div class="col d-flex justify-content-end" >
+						<P class="me-2 jvab">{% if invoice.shipping_cost == 0 %}{% trans '-' %}{% else %}
+							{{ invoice.shipping_cost|intcomma:False|persian_numbers }}
+							{% trans 'تومان' %}{% endif %}</P>
+					</div>
+				</div>
+
+			</div>
+
+			<div class=" wow fadeInUp mt-3" data-wow-delay=".3s">
+				<div class=" d-flex">
+					<div class="col">
+						<h6 class="onvan">{% trans "مبلغ پرداختی" %}: </h6>
+					</div>
+					<div class="col d-flex justify-content-end" >
+						<P class="me-2 jvab">{{ invoice.payable|intcomma:False|persian_numbers }} {% trans 'تومان' %}</P>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="row">
+				<button style="font-weight: 800; border: 5px #c7a17a; color: #363535" onclick="window.print()"><img class="ms-2" src="{% static 'images/acconte/print.svg' %}">{% trans "پرینت" %}</button>
+			</div>
+
+		</div>
+	</div>
+	</body>
+
+{% endblock content %}
+
+{% block footer %}{% endblock footer %}
+ 
+
+{% block js %}
+
+<script src="{% static 'order/js/print.js' %}"></script>
+
+
+{% endblock js %}

@@ -1,0 +1,224 @@
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+{% load utils %}
+
+
+<div class="{{class}} container container_boxed mt-lg-0 mt-5" style="border-radius: 10px">
+    <div class="checkout_form">
+
+            <div class="d-flex bd-highlight position-relative">
+                <div class="flex-fill bd-highlight d-flex justify-content-between">
+                    <div class="col-7 justify-content-between border-bottom mb-5" style="width: 180px">
+                        <h3 class=" text-uppercase wow fadeInUp mb-3">{% trans "جزئیات سفارش" %}</h3>
+                    </div>
+
+                </div>
+                <div class="flex-fill bd-highlight end-md-100">
+
+                    <button type="button" class=" float-start collapsed mt-3 ms-3 d-block d-lg-none " style="color: #cba783" data-bs-toggle="modal" data-bs-target="#myModal">
+                        <i class="fal fa-bars"></i>
+                    </button>
+                </div>
+
+                {% if order.is_payable %}
+                <form class="flex-fill bd-highlight d-md-flex justify-content-end d-none" action="{% url 'orders:order_review' order.tracking_code %}" method="post" id='repay_order_form'>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn_border border_black text-uppercase position-relative d-flex justify-content-center align-items-center" style="width:120px; height:30px;border-radius:  0 0 15px 15px; ">
+                        {% trans 'پرداخت' %}  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style= "background-color: #c7a17a;">{{ order.payable|intcomma:False|persian_numbers }} {% trans 'تومان' %} <span class="visually-hidden">unread messages</span></span>
+                    </button>
+                </form> 
+                {% endif %}
+
+
+
+            </div>
+
+            <div class="row g-sm-4 g-3 d-flex justify-content-center" >
+
+                {% if order.is_payable %}
+                <form class="totle-contain  p-2 d-flex justify-content-center w-50 d-block d-sm-none" action="{% url 'orders:order_review' order.tracking_code %}" method="post" id='repay_order_form'>
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn_border border_black text-uppercase position-relative d-flex justify-content-center align-items-center" style="width:120px; height:30px;border-radius:  0 0 15px 15px; ">
+                        {% trans 'پرداخت' %}   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style= "background-color: #c7a17a;">{{ order.payable|intcomma:False|persian_numbers }} {% trans 'تومان' %} <span class="visually-hidden">unread messages</span></span>
+                    </button>
+                </form> 
+                {% endif %}
+
+
+                <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+
+                  <div class="totle-contain border border-3 p-2 " style="border-radius: 0 0 15px 15px">
+                    <div class="totle-detail flex-column">
+                        <h5 >{% trans "شماره پیگیری" %} :</h5>
+                        <h5 style="color: #c7a17a;">{{order.tracking_code|persian_numbers}}</h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                  <div class="totle-contain border border-3 p-2" style="border-radius: 0 0 15px 15px;">
+                      <div class="totle-detail">
+                        <h5>{% trans "وضعیت" %} :</h5 >
+                        <h5 {% if order.order_status == order.CANCELED %}class="text-danger"{% endif %}>{{ order.get_order_status_display }}</h5>
+                        
+                    </div>
+
+                  </div>
+                </div>
+                <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                    <div class="totle-contain border border-3 p-2" style="border-radius: 0 0 15px 15px">
+                        <div class="totle-detail">
+                            <h5>{% trans "آدرس" %} :</h5>
+                            <h5 style="color: #c7a17a;">{{order.complete_address}}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                    <div class="totle-contain border border-3 p-2 " style="border-radius: 0 0 15px 15px">
+                        <div class="totle-detail">
+                            <h5>{% trans "روش پرداخت" %} :</h5>
+                            <h5 style="color: #c7a17a;">{{ order.get_payment_method_display }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                    <div class="totle-contain border border-3 p-2" style="border-radius: 0 0 15px 15px">
+                        <div class="totle-detail">
+                            <h5>{% trans "تاریخ ثبت سفارش" %} :</h5>
+                            <h5 style="color: #c7a17a;">{{ order.created|standard_jalali_date|persian_numbers }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+
+                <div class="col-xxl-4 col-lg-6 col-md-4 col-sm-6">
+                    <div class="totle-contain border border-3 p-2" style="border-radius: 0 0 15px 15px">
+                        <div class="totle-detail">
+                            <h5>{% trans "فاکتور" %} :</h5>
+                            {% comment %} <a class="fw-bolder" href="Factor.html" style="color: #c7a17a;">{% trans "pdf" %}</a> {% endcomment %}
+                            {% with order.last_invoice_absolute_url as last_invoice_absolute_url %}
+                                {% comment %} {% if last_invoice_absolute_url %} {% endcomment %}
+                                    {% if order.is_payable %}
+                                    
+                                        {% trans 'پیش فاکتور' as button_title %}
+                                        <a target="_blank"
+                                    title="{{ button_title }}"
+                                        >
+                                        <h5  style="color: #c7a17a;">{{ button_title }}</h5>
+                                    </a>
+                                    {% else %}
+                                        {% trans 'مشاهده صورتحساب' as button_title %}
+                                        <a href="{{ last_invoice_absolute_url }}" target="_blank"
+                                    title="{{ button_title }}"
+                                    style="color: #c7a17a;">
+                                    <h5 >{{ button_title }}</h5>
+                                    </a>
+                                    {% endif %}
+
+                                    
+                                {% comment %} {% endif %} {% endcomment %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% comment %} {% if order.order_status != order.CANCELED %}
+                    <div class="col-12 overflow-hidden">
+                        <ol class="progtrckr">
+                            <li class="progtrckr-{% if order.order_status == order.AWAITING_PAYMENT %}done{% else %}todo{% endif %}">
+                                <h5>{% trans 'در انتظار پرداخت' %}</h5>
+                            </li>
+                            <li class="progtrckr-{% if order.order_status == order.AWAITING_CHECK %}done{% else %}todo{% endif %}">
+                                <h5>{% trans 'در انتظار بررسی' %}</h5>
+                            </li>
+                            <li class="progtrckr-{% if order.order_status == order.DOING %}done{% else %}todo{% endif %}">
+                                <h5>{% trans 'در حال انجام' %}</h5>
+                            </li>
+                            <li class="progtrckr-{% if order.order_status == order.PACKING %}done{% else %}todo{% endif %}">
+                                <h5>{% trans 'بسته بندی' %}</h5>
+                            </li>
+                            <li class="progtrckr-{% if order.order_status == order.DONE %}done{% else %}todo{% endif %}">
+                                <h5>{% trans 'تکمیل شده' %}</h5>
+                            </li>
+                            <li class="progtrckr-{% if order.order_status == order.SENT %}done{% else %}todo{% endif %}">
+                                <h5>{% trans 'ارسال شده' %}</h5>
+                            </li>
+                            {% if order.order_status == order.RETURNED %}
+                                <li class="progtrckr-done">
+                                    <h5>{% trans 'مسترد شده' %}</h5>
+                                </li>
+                            {% endif %}
+
+                        </ol>
+                    </div>
+                {% endif %} {% endcomment %}
+
+            <div class="row mt-5 p-4 p-md-0">
+
+                <table class="table ">
+                    <thead>
+                    <tr style="color: #c7a17a ">
+                        <th>{% trans "تصویر محصول" %}</th>
+                        <th>{% trans "اسم محصول" %}</th>
+                        <th>{% trans "قیمت" %}</th>
+                        <th>{% trans "تخفیف" %}</th>
+                        <th>{% trans "تعداد" %}</th>
+                        <th>{% trans "قیمت کل" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_items %}
+                       
+                    <tr class="link" style="color: white">
+                        <td><img src="{{ item.product.get_image }}" alt="{{ item.name }}" class="border rounded-pill" style="width: 50px; height: 50px;"></td>
+                        <td class="pt-4">{{item.name}}</td>
+                        <td class="pt-4">{{ item.get_price|intcomma:False|persian_numbers }} {% trans 'تومان' %}</td>
+                        <td class="pt-4">{% if item.discount %}{{ item.discount|intcomma:False|persian_numbers }}
+                            {% trans 'تومان' %}{% else %}-{% endif %}</td>
+                        <td class="pt-4">{{ item.quantity|persian_numbers }} {% trans 'عدد' %}</td>
+                        <td class="pt-4">{{ item.amount_payable|intcomma:False|persian_numbers }} {% trans 'تومان' %}</td>
+                    </tr>
+                     
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row d-flex justify-content-center mt-4 p-4 p-md-0">
+
+                <table  class="table" style="width: 700px; color: white">
+                    <tfoot>
+                    <tr class="fw-bolder" style="color: #c7a17a; font-size: larger ">
+                        <th>{% trans 'جمع کل کالاها' %} ({{ order_items.count|persian_numbers }})</th>
+                        {% if order.total_discount %}
+                            <th>{% trans 'تخفیف کالا ها' %}</th>{% endif %}
+                        {% if order.discount_amount %}
+                            <th>{% trans 'مبلغ کوپن تخفیف' %}</th>{% endif %}
+                        <th>{% if order.paid %}{% trans 'مبلغ پرداخت شده' %}
+                        {% else %}{% trans 'مبلغ قابل پرداخت' %}{% endif %}</th>
+                    </tr>
+                    <tr class="fw-bolder link">
+                        <th>{{ order.commodity_prices|intcomma:False|persian_numbers }} {% trans 'تومان' %}</th>
+                        {% if order.total_discount %}
+                            <th>{{ order.total_discount|intcomma:False|persian_numbers }} {% trans 'تومان' %}</th>{% endif %}
+                        {% if order.discount_amount %}
+                            <th>{{ order.discount_amount|intcomma:False|persian_numbers }} {% trans 'تومان' %}</th>{% endif %}
+                        <th>{% if order.shipping_cost == 0 %}{% trans '-' %}{% else %}
+                            {{ order.shipping_cost|intcomma:False|persian_numbers }} {% trans 'تومان' %}{% endif %}</th>
+                        <th>{{ order.payable|intcomma:False|persian_numbers }} {% trans 'تومان' %}</th>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+
+
+
+
+    </div>
+</div>

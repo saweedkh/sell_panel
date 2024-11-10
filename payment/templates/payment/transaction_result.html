@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'نتیجه تراکنش' %}{% endblock %}
+{% block meta_description %}{% endblock %}
+{% block meta_keywords %}{% endblock %}
+
+{% block canonical %}
+    {% if page.canonical %}
+        <link rel="canonical" href="{{ page.canonical }}"/>
+    {% else %}
+        {% if request.is_secure %}
+            <link rel="canonical" href="https://{{ request.get_host }}{{ request.path }}"/>
+        {% else %}
+            <link rel="canonical" href="http://{{ request.get_host }}{{ request.path }}"/>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    {% if is_success %}
+        <div class="card card-style bg-25" data-card-height="200" style="height: 200px;">
+            <div class="card-center">
+                <p class="text-center mb-2">
+                    <i class="fa fa-check-circle color-green-dark fa-4x"></i>
+                </p>
+                <h1 class="color-white text-center mb-0">{{ message }}</h1>
+                <p class="color-white text-center opacity-60 mt-n1 mb-3">
+                    {% trans 'کد رهگیری:' %} {{ tracking_code }}
+                </p>
+            </div>
+            <div class="card-overlay bg-black opacity-80"></div>
+        </div>
+    {% else %}
+        <div class="card card-style bg-25" data-card-height="200" style="height: 200px;">
+            <div class="card-center">
+                <p class="text-center mb-2">
+                    <i class="fa fa-exclamation-circle color-red-dark fa-4x"></i>
+                </p>
+                <h2 class="color-white text-center mb-0">{{ message }}</h2>
+            </div>
+            <div class="card-overlay bg-black opacity-80"></div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

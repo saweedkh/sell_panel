@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load i18n %}
+
+{% block title %}{% trans 'بارگذاری فیش بانکی' %}{% endblock %}
+
+{% block content %}
+    <section class="breadscrumb-section pt-0">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadscrumb-contain">
+                        <h2>{% trans 'بارگذاری فیش بانکی' %}</h2>
+                        <nav>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'pages:home' %}" title="{% trans 'بازگشت به فروشگاه' %}">
+                                        <i class="fa-solid fa-house"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active"
+                                    aria-current="page">{% trans 'بارگذاری فیش بانکی' %}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if setting.transfer_content or cards %}
+        {% if setting.transfer_content %}
+            <section class="order-detail">
+                <div class="container-fluid-lg">
+                    <div class="order-details-contain">
+                        <div class="order-details-name">
+                            {{ setting.transfer_content|safe }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+        <div class="row mx-3">
+            <section class="user-dashboard-section section-b-space col-12 col-lg-6">
+                <div class="dashboard-right-sidebar">
+                    <div class="dashboard-card text-center">
+                        <div class="d-flex justify-content-center mb-2">
+                            <h3>{% trans 'قابل پرداخت' %} : {{ amount|intcomma:False }} {% trans 'تومان' %}</h3>
+                        </div>
+
+                        <div class="row justify-content-center">
+                            {% for card in cards %}
+                                <div class="col-xxl-6 col-md-8 col-sm-12">
+                                    <div class="payment-card-detail">
+                                        <div class="card-details">
+                                            {% if card.bank_logo and card.bank_logo_thumbnail %}
+                                                <img class="float-start bank-logo" loading="lazy"
+                                                     src="{{ card.bank_logo.url }}"
+                                                     width="50">
+                                            {% endif %}
+                                            <h5 class="mt-2 float-end">{{ card.bank_name }}</h5>
+
+                                            <div class="valid-detail justify-content-center">
+                                                {% if card.card_number or card.shaba %}
+                                                    <div class="card-number text-center">
+                                                        {% if card.card_number %}
+                                                            <h4 class="fix_number_direction">{{ card.pretty_card_number }}</h4>{% endif %}
+                                                        {% if card.shaba %}
+                                                            <h6 class="opacity-50">{{ card.shaba }}</h6>{% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="valid-detail justify-content-between">
+                                                <div class="title">
+                                                    <span>{% trans 'صاحب کارت' %}</span>
+                                                    <span>{{ card.fullname }}</span>
+                                                </div>
+
+                                                {% if card.account_number %}
+                                                    <div class="title">
+                                                        <span>{% trans 'شماره حساب' %}</span>
+                                                        <div>{{ card.account_number }}</div>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="order-detail-section col-12 col-lg-6 px-3 pt-lg-5 pb-5">
+                <div class="container-fluid-lg">
+                    <div class="title">
+                        <h2>{% trans 'بارگذاری رسید بانکی' %}</h2>
+                        <p class="mb-2">
+                            {% trans 'عکس رسید بانکی را بارگذاری کنید' %}
+                        </p>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="file-data row justify-content-around">
+                            <div class="col-9">
+                                {{ form.image }}
+                            </div>
+                            <div class="col-3">
+                                <button type="submit"
+                                        class="btn btn-sm btn-animation btn-theme-color btn-center float-end w-100 h-100 ms-2">{% trans 'ثبت' %}</button>
+                            </div>
+                        </div>
+                        <img id="image-data" src="" class="img-fluid my-2">
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% else %}
+
+        <section class="breadscrumb-section pt-0">
+            <div class="container-fluid-lg">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadscrumb-contain breadscrumb-order">
+                            <div class="order-box">
+                                <div class="order-image">
+                                    <img src="{% static 'firefly/images/inner-page/order-success.png' %}"
+                                         loading="lazy" alt="order-success">
+                                </div>
+
+                                <div class="order-contain">
+                                    <h3 class="theme-color">{% trans 'سفارش با موفقیت ثبت شد.' %}</h3>
+                                    <h5 class="text-content">{% trans 'در صورت لزوم همکاران ما در اسرع وقت با شما تماس خواهند گرفت.' %}</h5>
+                                    <h6 class="mb-3">{% trans 'کد رهگیری' %} :
+                                        <span class="copy-tracking-code" data-val="{{ tracking_code }}"
+                                              onclick="copy_text(this)">{{ tracking_code }}
+                                    <i class="fa fa-copy cursor-pointer"></i></span>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}
+
+{% block custom_js %}
+    <script type="text/javascript" src="{% static 'payment/js/copy-to-clipboard.js' %}"></script>
+    <script type="text/javascript" src="{% static 'payment/js/show_uploaded_media.js' %}"></script>
+{% endblock %}

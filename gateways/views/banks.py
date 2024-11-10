@@ -1,0 +1,48 @@
+# Python Standard Library
+import logging
+from urllib.parse import unquote
+
+# Django Built-in modules
+from django.http import Http404
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+
+# Local apps
+from gateways.bankfactories import BankFactory
+from gateways.exceptions import BankGatewaysException
+
+
+@csrf_exempt
+def callback_view(request):
+    bank_type = request.GET.get('bank_type', None)
+    identifier = request.GET.get('identifier', None)
+
+    if not bank_type:
+        logging.critical("Bank type is required. but it doesnt send.")
+        raise Http404
+
+    factory = BankFactory()
+    bank = factory.create(bank_type, identifier=identifier)
+    try:
+        bank.verify_from_gateway(request)
+    except BankGatewaysException:
+        logging.exception("Verify from gateway failed.", stack_info=True)
+    return bank.redirect_client_callback()
+
+
+@csrf_exempt
+def go_to_bank_gateway(request):
+    context = {
+        'params': {}
+    }
+    for key, value in request.GET.items():
+        if key == 'url' or key == 'method':
+            context[key] = unquote(value)
+        else:
+            context['params'][key] = unquote(value)
+
+    return render(
+        request,
+        'gateways/redirect_to_bank.html',
+        context=context
+    )

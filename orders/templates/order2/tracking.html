@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans 'پیگیری سفارش' %}{% endblock %}
+
+{% block content %}
+    <section class="breadscrumb-section pt-0">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadscrumb-contain">
+                        <h2>{% trans 'پیگیری سفارش' %}</h2>
+                        <nav>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'pages:home' %}" title="{% trans 'صفحه اصلی فروشگاه' %}">
+                                        <i class="fa-solid fa-house"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">{% trans 'پیگیری سفارش' %}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="order-detail">
+        <div class="container-fluid-lg">
+            <div class="row g-sm-4 g-3">
+                <div class="dashboard-address">
+                    <div class="profile-detail dashboard-bg-box">
+                        <div class="dashboard-title">
+                            <h3>{% trans 'پیگیری سفارش' %}</h3>
+                            <p>{% trans 'برای پیگیری سفارش، کد رهگیری و شماره تلفن سفارش خود را وارد کنید.' %}</p>
+
+                            <form method="post">
+                                {% include 'inc/messages.html' %}
+                                {% csrf_token %}
+                                <div class="row g-4">
+                                    <div class="col-xxl-12"></div>
+                                    <div class="form-floating theme-form-floating col-xxl-6">
+                                        {{ form.tracking_code|as_crispy_field }}
+                                    </div>
+
+                                    <div class="form-floating theme-form-floating col-xxl-6">
+                                        {{ form.mobile_number|as_crispy_field }}
+                                        <small>{% trans 'این شماره تلفن باید با شماره ای که درهنگام ثبت سفارش وارد کرده اید یکسان باشد.' %}</small>
+                                    </div>
+                                    <div class="form-floating theme-form-floating col-xxl-12">
+                                        <button class="btn btn-animation btn-theme-color proceed-btn btn-center w-100">
+                                            {% trans 'جستجو' %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

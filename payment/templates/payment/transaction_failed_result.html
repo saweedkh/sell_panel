@@ -1,0 +1,64 @@
+{% extends "fa_base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans 'نتیجه تراکنش' %}{% endblock %}
+
+{% block content %}
+
+<!-- main body - start
+================================================== -->
+<main>
+
+    <section class="contact_section sec_ptb_120 d-flex justify-content-center mt-3">
+        <div class="row container" style="width: 1000px;">
+
+            <div class="col-lg-6 contact_form  wow fadeInUp d-flex align-items-center flex-column"
+                    data-wow-delay=".1s" style="height: 450px">
+                <div class="row mt-5">
+                    <h4 class="mb-3">{% trans "پرداخت سفارش ناموفق بود!" %}</h4>
+                    <p>{% trans "و اگر مبلغی از حساب شما کسر شده است تا ۲۴ ساعت آینده به حساب شما بازمیگردد" %}</p>
+                </div>
+                <form action="#" class="mt-2">
+                    <div class="row">
+                        <div>
+                            <div class="form_item">
+                                <label>{% trans "کد رهگیری " %}:</label>
+                                <div class=" d-flex justify-content-center">
+                                    <input type="text" disabled value="{{order.tracking_code}}" id="myInput"  style="width: 220px; color: white">
+                                    <span class="input-group-text btn btn_primary text-uppercase"
+                                            onclick="myFunction()" id="basic-addon1">
+                        {% trans "کپی کردن" %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-copy me-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                            d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"></path>
+                    </svg>
+                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6 contact_form  wow fadeInUp d-flex justify-content-center align-items-center"
+                    data-wow-delay=".1s" style="height: 450px">
+                <img src="{% static 'images/new_photo/coffee_cups.png' %}"
+                        alt="image_not_found" data-animation="fadeInUp" data-delay=".2s" style="max-width: 300px">
+            </div>
+            <script>
+                $.toast({
+                    heading: 'Success',
+                    text: 'And these were just the basic demos! Scroll down to check further details on how to customize the output.',
+                    showHideTransition: 'slide',
+                    icon: 'success'
+                })
+            </script>
+        </div>
+    </section>
+</main>
+<!-- main body - end
+================================================== -->
+
+{% endblock content %}

@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load i18n %}
+{% load utils %}
+
+{% block title %}{% trans 'مرور سفارش' %}{% endblock %}
+
+{% block content %}
+    <section class="breadscrumb-section pt-0">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadscrumb-contain">
+                        <h2>{% trans 'مرور سفارش' %}</h2>
+                        <nav>
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'pages:home' %}" title="{% trans 'صفحه اصلی فروشگاه' %}">
+                                        <i class="fa-solid fa-house"></i>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">{% trans 'مرور سفارش' %}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="order-detail">
+        <div class="container-fluid-lg">
+            <div class="row g-sm-4 g-3">
+
+                <form action="{% url 'order:order_review' order.tracking_code %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-animation btn-theme-color proceed-btn w-100"
+                            type="submit">{% trans 'پرداخت' %} {{ order.payable|intcomma:False }} {% trans 'تومان' %}</button>
+                </form>
+
+                <div class="col-xl-6 col-sm-6">
+                    <div class="order-details-contain">
+                        <div class="order-tracking-icon">
+                            <i class="text-content" data-feather="info"></i>
+                        </div>
+
+                        <div class="order-details-name">
+                            <h5 class="text-content">{% trans 'شماره پیگیری' %}</h5>
+                            <h4>{{ order.tracking_code }}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-sm-6">
+                    <div class="order-details-contain">
+                        <div class="order-tracking-icon">
+                            <i class="text-content" data-feather="package"></i>
+                        </div>
+
+                        <div class="order-details-name">
+                            <h5 class="text-content">{% trans 'وضعیت' %}</h5>
+                            <h4>{{ order.get_order_status_display }}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-sm-6">
+                    <div class="order-details-contain">
+                        <div class="order-tracking-icon">
+                            <i class="text-content" data-feather="map-pin"></i>
+                        </div>
+
+                        <div class="order-details-name">
+                            <h5 class="text-content">{% trans 'آدرس' %}</h5>
+                            <h4>{{ order.address }}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-sm-6">
+                    <div class="order-details-contain">
+                        <div class="order-tracking-icon">
+                            <i class="text-content" data-feather="calendar"></i>
+                        </div>
+
+                        <div class="order-details-name">
+                            <h5 class="text-content">{% trans 'تاریخ ثبت سفارش' %}</h5>
+                            <h4>{{ order.created|standard_jalali }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="order-table-section section-b-space">
+        <div class="container-fluid-lg">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table order-tab-table">
+                            <thead>
+                            <tr>
+                                <th>{% trans 'تصویر محصول' %}</th>
+                                <th>{% trans 'نام' %}</th>
+                                <th>{% trans 'قیمت' %}</th>
+                                <th>{% trans 'تخفیف' %}</th>
+                                <th>{% trans 'تعداد' %}</th>
+                                <th>{% trans 'قیمت کل' %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in order.orderitem_set.all %}
+                                <tr>
+                                    <td><img src="{{ item.product.get_image }}" width="60" loading="lazy"
+                                             alt="{{ item.name }}"></td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.get_price|intcomma:False }} {% trans 'تومان' %}</td>
+                                    <td>{% if item.discount %}{{ item.discount|intcomma:False }}
+                                        {% trans 'تومان' %}{% else %}-{% endif %}
+                                    </td>
+                                    <td>{{ item.quantity }} {% trans 'عدد' %}</td>
+                                    <td>{{ item.amount_payable|intcomma:False }} {% trans 'تومان' %}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <table class="table order-tab-table">
+                            <tfoot>
+                            <tr class="border-top border-dark">
+                                <th>{% trans 'جمع کل کالاها' %} ({{ order.orderitem_set.count }})</th>
+                                {% if order.total_discount %}
+                                    <th>{% trans 'تخفیف کالا ها' %}</th>{% endif %}
+                                {% if order.discount_amount %}
+                                    <th>{% trans 'مبلغ کوپن تخفیف' %}</th>{% endif %}
+                                </th>
+                                <th>{% if order.paid %}{% trans 'مبلغ پرداخت شده' %}
+                                {% else %}{% trans 'مبلغ قابل پرداخت' %}{% endif %}</th>
+                            </tr>
+                            <tr>
+                                <th>{{ order.commodity_prices|intcomma:False }} {% trans 'تومان' %}</th>
+                                {% if order.total_discount %}
+                                    <th>{{ order.total_discount|intcomma:False }} {% trans 'تومان' %}</th>{% endif %}
+                                {% if order.discount_amount %}
+                                    <th>{{ order.discount_amount|intcomma:False }} {% trans 'تومان' %}</th>{% endif %}
+                                <th>{% if order.shipping_cost == 0 %}{% trans '-' %}{% else %}
+                                    {{ order.shipping_cost|intcomma:False }} {% trans 'تومان' %}{% endif %}</th>
+                                <th>{{ order.payable|intcomma:False }} {% trans 'تومان' %}</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="order-items-container d-md-none">
+                        <h4>{% trans 'سبد خرید' %} ({{ order.orderitem_set.count }})</h4>
+                        <hr>
+                        {% for item in order.orderitem_set.all %}
+                            <div class="order-item">
+                                <img src="{{ item.product.get_image }}" loading="lazy"
+                                     alt="{{ item.name }}">
+                                <ul class="order-item-detail">
+                                    <li class="fs-5">{{ item.name }}</li>
+                                    <li><span>{% trans 'قیمت' %}:</span>
+                                        {{ item.get_price|intcomma:False }} {% trans 'تومان' %}</li>
+                                    {% if item.discount %}
+                                        <li><span>{% trans 'تخفیف' %}:</span>
+                                            {{ item.discount|intcomma:False }} {% trans 'تومان' %}</li>
+                                    {% endif %}
+                                    <li><span>{% trans 'تعداد' %}:</span> {{ item.quantity }} {% trans 'عدد' %}</li>
+                                    <li><span>{% trans 'قیمت کل' %}:</span>
+                                        {{ item.amount_payable|intcomma:False }} {% trans 'تومان' %}</li>
+                                </ul>
+                            </div>
+                            <hr>
+                        {% endfor %}
+                        <div class="order-item-detail">
+                            <ul>
+                                <li class="order-detail-list">
+                                    <div>{% trans 'جمع کل کالاها' %}:</div>
+                                    <div>{{ order.commodity_prices|intcomma:False }} {% trans 'تومان' %}</div>
+                                </li>
+                                {% if order.total_discount %}
+                                    <li class="order-detail-list">
+                                        <div>{% trans 'تخفیف کالا ها' %}:</div>
+                                        <div>{{ order.total_discount|intcomma:False }} {% trans 'تومان' %}</div>
+                                    </li>
+                                {% endif %}
+                                {% if order.discount_amount %}
+                                    <li class="order-detail-list">
+                                        <div>{% trans 'مبلغ کوپن تخفیف' %}:</div>
+                                        <div>{{ order.discount_amount|intcomma:False }} {% trans 'تومان' %}</div>
+                                    </li>
+                                {% endif %}
+                                <li class="order-detail-list">
+                                    <div>{% if order.shipping_cost == 0 %}{% trans '-' %}{% else %}
+                                        {{ order.shipping_cost|intcomma:False }} {% trans 'تومان' %}{% endif %}</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <hr>
+                        <div class="order-detail-list">
+                            <div>{% if order.paid %}{% trans 'مبلغ پرداخت شده' %}:
+                                {% else %}{% trans 'مبلغ قابل پرداخت' %}:{% endif %}</div>
+                            <div>{{ order.payable|intcomma:False }} {% trans 'تومان' %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

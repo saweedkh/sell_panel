@@ -1,0 +1,478 @@
+{% extends "fa_base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+{% load utils %}
+{% load crispy_forms_filters %}
+{% load widget_tweaks %}
+
+
+{% block content %}
+
+<main>
+
+    <!-- cart_sidebar - start
+    ================================================== -->
+    {% include "inc/fa-cart_slidbar.html" %}
+
+    <!-- cart_sidebar - end
+    ================================================== -->
+
+    <!-- breadcrumb_section - start
+    ================================================== -->
+    <section class="breadcrumb_section text-uppercase" style="background-image: url({% static 'images/breadcrumb/breadcrumb_bg_01.jpg' %});">
+    {% include "inc/fa-breadcrumb_section.html" with page_name="تکمیل سفارش" %}
+    </section>
+
+    <!-- breadcrumb_section - end
+    ================================================== -->
+
+    <!-- cart_section - start
+    ================================================== -->
+    <section class="cart_section sec_ptb_120 bg_default_gray">
+        <div class="container container_boxed">
+            <div class="checkout_form ">
+                <div class="accordion mb-4" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: 800">
+                                {% trans "خلاصه سفارش" %}
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                {% for item in cart.items %}
+                                {% with item.variant as variant %}
+                                {% with variant.product as product %}
+                                
+                                <div class=" d-md-flex justify-content-between" action="#">
+
+                                    <div class="col">
+
+
+                                        <div class=" wow fadeInUp" data-wow-delay=".3s">
+                                            <div class=" d-flex">
+                                                <h6>{% trans "قیمت" %} : </h6>
+                                                <P class="me-2">{{item.final_subtotal|intcomma:False|persian_numbers}} {% trans "تومان" %}</P>
+                                            </div>
+                                        </div>
+
+                                        <div class=" wow fadeInUp" data-wow-delay=".3s">
+                                            <div class=" d-flex">
+                                                <h6>{% trans "نام محصول" %} : </h6>
+                                                <P class="me-2">{{variant.variant_descriptor}}</P>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+
+                                        <div class="col d-flex justify-content-lg-end ms-3 mt-3">
+                                            <img src="{{product.get_image}}" style="width: 60px; height: 70px">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                {% endwith %}
+                                {% endwith %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="order_form" method="post"  data-url="{% url 'ajax:load_cities' %}">
+                    {% csrf_token %}
+
+                    {% if order_form.errors %}
+                        <div class="my-3 p-2 text-center text-danger form-error-wrapper">
+                            <span><i class="fa fa-exclamation-triangle"></i></span>
+                            <strong>{% trans 'لطفا خطا های فرم را اصلاح کنید.' %}</strong>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex align-items-center my-3">
+                        <h2 class="mb-0">{% trans 'اطلاعات صورتحساب' %}</h2>
+                        {% if request.user.is_authenticated %}
+                            <button class="btn btn-animation btn-theme-color btn-theme-color btn-sm fw-bold ms-auto" type="button"
+                                    data-bs-toggle="modal" data-bs-target="#add-address">
+                                <i class="fa-solid fa-plus d-block d-sm-none m-0"></i>
+                                <span class="d-none d-sm-block btn-theme-color">+ {% trans 'افزودن آدرس' %}</span>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    {% if request.user.is_authenticated %}
+                        <div id="address_wrapper">
+                            <div class="row g-4">
+                                {% for address in order_form.fields.address_id.queryset %}
+                                    <div class="col-xxl-6 col-lg-12 col-md-6">
+                                        <div class="delivery-address-box {% if forloop.last %}selected-address{% endif %}">
+                                            <div class= "border border-2 rounded-3 p-3" style= "height: 240px;">
+                                                <div class="form-check">
+                                                   <input class="form-check-input" type="radio" name="address_id" style="background-color: #cba783; width: 20px; height: 20px;" 
+                                                           value="{{ address.id }}"
+                                                           id="id_address_{{ forloop.counter0 }}"
+                                                           {% if forloop.last %}checked{% endif %}>
+                                                </div>
+
+                                                <ul class="delivery-address-detail" style = " list-style-type: none;">
+                                                    <li class="fw-bold">
+                                                        {% if address.title %}<label>{{ address.title }}</label>{% endif %}
+
+                                                    </li>
+                                                    <li>
+                                                        <h4 class="fw-500">{{ address.get_fullname }}</h4>
+                                                    </li>
+
+                                                    <li>
+                                                        <p class="text-content">{% trans 'آدرس' %}
+                                                            : {{ address.get_full_address }}</p>
+                                                    </li>
+
+                                                    {% if address.postal_code %}
+                                                        <li>
+                                                            <h6 class="text-content"><span
+                                                                    class="text-title">{% trans 'کد پستی' %} :</span>
+                                                                {{ address.postal_code|persian_numbers }}</h6>
+                                                        </li>
+                                                    {% endif %}
+
+                                                    <li>
+                                                        <h6 class="text-content mb-0 d-flex gap-1">   
+                                                            <span
+                                                                    class="text-title">{% trans 'تلفن' %} :</span>                                                            
+                                                                     <span class="text-title">
+                                                                
+                                                                
+                                                                <div class="fix_number_direction">
+                                                                {{ address.mobile_number|persian_numbers }}
+                                                                </div>
+                                                            </span>
+                                                        </h6>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-center ">
+                                        <h3 class="p-2 rounded border-2 border-r10 border-dark">{% trans 'آدرسی برای نمایش وجود ندارد. لطفا یک آدرس جدید ایجاد کنید.' %}</h3>
+                                    </div>
+                                {% endfor %}
+                                {{ order_form.address_id.errors }}
+                            </div>
+                        </div>
+                    {% else %}
+                            <h3 class="form_title text-uppercase wow fadeInUp">{% trans "اطلاعات صورتحساب" %}</h3>
+
+                            <div class="row wow fadeInUp" data-wow-delay=".3s">
+                                <div class="col-lg-6">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.first_name.id_for_label }}">{{ order_form.first_name.label }}</label>
+                                        {% render_field order_form.first_name class='form-control' %}
+                                        {{ order_form.first_name.errors }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.last_name.id_for_label }}">{{ order_form.last_name.label }}</label>
+                                        {% render_field order_form.last_name class='form-control' %}
+                                        {{ order_form.last_name.errors }}     
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.mobile_number.id_for_label }}">{{ order_form.mobile_number.label }}</label>
+                                        {% render_field order_form.mobile_number class='form-control' %}
+                                        {{ order_form.mobile_number.errors }}    
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.email.id_for_label }}">{{ order_form.email.label }}</label>
+                                        {% render_field order_form.email class='form-control' %}
+                                        {{ order_form.email.errors }}
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.province_id.id_for_label }}">{{ order_form.province_id.label }}</label>
+                                        {% render_field order_form.province_id class='form-select' %}
+                                        {{ order_form.province_id.errors }}
+                                    </div>
+        
+                                </div>
+
+                                <div class="col-lg-4">                        
+                                    <div class="form_item">
+                                        <label for="{{ osrder_form.city_id.id_for_label }}">{{ order_form.city_id.label }}</label>
+                                        {% render_field order_form.city_id class='form-select' %}
+                                        {{ order_form.city_id.errors }}
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.postal_code.id_for_label }}">{{ order_form.postal_code.label }}</label>
+                                        {% render_field order_form.postal_code class='form-control' %}
+                                        {{ order_form.postal_code.errors }}
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-12">
+                                    <div class="form_item">
+                                        <label for="{{ order_form.address.id_for_label }}">{{ order_form.address.label }}</label>
+                                        {% render_field order_form.address class='form-control' style='height: 100px;' %}
+                                        {{ order_form.address.errors }}
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        {% endif %}
+
+                    <div class="row my-4" style="border-bottom: 1px solid #f7f7f7;">
+                        <h5>{% trans 'روش های پرداخت' %}</h5>
+                        <div class="form-check">
+                            {% for payment_method in order_form.fields.payment_method.choices %}
+
+                                <div class="col-12">
+                                    <div class="delivery-option">
+                                        <div class="row g-4">
+                                            <div class="col-12">
+                                                <div class="delivery-category">
+                                                    <div class="shipment-detail">
+                                                        <div class="form-check custom-form-check">
+                                                            <input class="form-check-input" type="radio" style="background-color: #cba783; margin-left: 900px" 
+                                                                name="payment_method"
+                                                                id="id_payment_method_{{ forloop.counter0 }}"
+                                                                value="{{ payment_method.0 }}"
+                                                                {% if order_form.payment_method.initial == payment_method.0 %}checked{% endif %}>
+                                                            <label class="form-check-label" style="font-weight: 800; font-size: larger;"
+                                                                for="id_payment_method_{{ forloop.counter0 }}">
+                                                                {{ payment_method.1 }}
+                                                            </label>
+                                                            {% if payment_method.0 == order_form.Meta.model.WALLET %}
+                                                                <div class="ms-3">
+                                                                    {% trans 'موجودی:' %} {{ request.user.wallet.balance|intcomma:False }} {% trans 'تومان' %}
+                                                                </div>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {{ order_form.payment_method.errors }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center my-3">
+                        <h2 class="mb-0">{% trans 'توضیحات سفارش' %}</h2>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-xxl-12 col-lg-12 col-md-12 order-xxl-1 order-lg-2 order-md-1">
+                            <div class="accordion accordion-flush custom-accordion">
+                                <div class="accordion-item">
+                                    <div id="flush-collapseOne">
+                                        <div class="">
+                                            <div class="row g-2">
+                                                <div class="col-12">
+                                                    <div class="row form_item mt-3">
+                                                        <label for="{{ order_form.note.id_for_label }}">{{ order_form.note.label }}</label>
+                                                        {% render_field order_form.note class='form-control' %}
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="accordion mb-4" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-weight: 800">
+                                {% trans "کوپن تخفیف" %}
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <form id="discount_form" method="post" data-url="{% url 'carts:apply_discount_coupon' %}">
+                                    <div class="form_item wow fadeInUp d-flex justify-content-center" data-wow-delay=".2s">
+
+                                        <input type="text" name="discount_coupon" id="discount_code"
+                                                                class="form-control persian_digit" required
+                                                                placeholder="{% trans 'کوپن تخفیف خود را وارد کنید' %}">
+                                        <button class="btn btn_primary text-uppercase" type="submit">{% trans "ثبت" %}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="row mt-3" id="invoice-section">
+                    <div class=" wow fadeInUp" data-wow-delay=".3s">
+                        <div class=" d-flex">
+                            <div class="col">
+                                <h6>{% trans "مبلغ کل کالا ها" %} : </h6>
+                            </div>
+                            <div class="col d-flex justify-content-end" >
+                                <P class="me-2">{{cart.total_items|intcomma:False|persian_numbers}} {% trans "تومان" %}</P>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {% if cart.discount %}
+                        <div class=" wow fadeInUp" data-wow-delay=".3s">
+                            <div class=" d-flex">
+                                <div class="col">
+                                    <h6>{% trans 'تخفیف' %}: </h6>
+                                    <button data-cid="{{ cart.discount.pk }}" class="remove-coupon-btn">
+                                        <i class="fa fa-trash text-danger"></i>{% trans 'حذف' %}
+                                    </button>
+                                    {% if cart.discount.description %}
+                                    <p>{{ cart.discount.description }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col d-flex justify-content-end" >
+                                    <P class="me-2">{{ cart.discount.amount|intcomma:False|persian_numbers }}  {% trans "تومان" %}</P>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endif %}
+
+                    {% if cart.total_profit %}
+                    <div class=" wow fadeInUp" data-wow-delay=".3s">
+                        <div class=" d-flex">
+                            <div class="col">
+                                <h6>{% trans 'سود شما از خرید' %}: </h6>
+                            </div>
+                            <div class="col d-flex justify-content-end" >
+                                <P class="me-2 text-danger"> (%{{ cart.profit_percent|persian_numbers }}) {{ cart.total_profit|intcomma:False|persian_numbers }} {% trans 'تومان' %}</P>
+                            </div>
+                        </div>
+
+                    </div>  
+                    {% endif %}
+
+                    <div class=" wow fadeInUp" data-wow-delay=".3s">
+                        <div class=" d-flex">
+                            <div class="col">
+                                <h6>{% trans "هزینه ارسال" %}: </h6>
+                                <p>{{cart.get_shipping_title}}
+                                    {% if cart.get_shipping_description %}
+                                    ({{cart.get_shipping_description}})
+                                    {% endif %}</p>
+                            </div>
+                            <div class="col d-flex justify-content-end" >
+                                <P class="me-2">
+                                    {% if cart.get_shipping_price != 0 %}
+                                    {{cart.get_shipping_price|intcomma:False|persian_numbers}} {% trans "تومان" %}
+                                    {% else %}
+                                    {% trans '-' %}{% endif %}</P>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class=" wow fadeInUp mt-3" style="border-bottom: 1px solid #f7f7f7;" data-wow-delay=".3s">
+                        <div class=" d-flex">
+                            <div class="col">
+                                {% if cart.payment.enable %}
+                                    <h6>{% trans 'مبلغ بیعانه' %} : </h6>
+                                {% else %}
+                                <h6>{% trans "قابل پرداخت" %} : </h6>
+                                {% endif %}
+                            </div>
+                            <div class="col d-flex justify-content-end" >
+                                <P class="me-2">{{cart.total|intcomma:False|persian_numbers}} {% trans "تومان" %}</P>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="row mt-3">
+                    <div class="form-check">
+                        {% if global_settings.accept_terms_text %}
+                            <input id="accept_terms" class="form-check-input" type="checkbox" checked=""  style="background-color: #cba783; margin-left: 800px;">
+                            <label class="form-check-label" for="accept_terms">
+                                <a class="form-check-label" href='{% url "pages:terms_and_conditions" %}'>{{ global_settings.accept_terms_text }}</a>
+                            </label>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="checkout_form_footer wow fadeInUp mt-3" data-wow-delay=".5s">
+                    
+                    <button class="btn btn_primary text-uppercase w-100" id="payment_button" type="submit" form="order_form">{% trans "پرداخت" %}</button>
+                </div>
+
+
+            </div>
+            {% if request.user.is_authenticated %}
+        <div class="modal fade theme-modal" id="add-address"   tabindex="-1" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content"  style= "background-color: #353535">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel1">{% trans 'افزودن آدرس' %}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                    <form id="id_address_form" data-load-cities-url="{% url 'ajax:load_cities' %}">
+                        <div class="modal-body">
+                            {{ address_form|crispy }}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-md close-address-modal btn_border border_black text-uppercase "
+                                    data-bs-dismiss="modal">{% trans 'بستن' %}</button>
+                            <button type="submit" id="add_address_btn" data-url="{% url 'ajax:address_add' %}"
+                                    class="btn theme-bg-color btn-md  btn_primary text-uppercase">
+                                {% trans 'افزودن' %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+        <input id="load-cities-url" type="hidden" data-load-cities-url="{% url 'ajax:load_cities' %}">
+        </div>
+    </section>
+    <!-- cart_section - end
+    ================================================== -->
+
+</main>
+
+{% endblock content %}
+
+
+{% block js %}
+<script src="{% static 'ajax/js/load_cities.js' %}" type="text/javascript"></script>
+{% endblock js %}

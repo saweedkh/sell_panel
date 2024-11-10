@@ -1,0 +1,281 @@
+[
+  {
+    "model": "transportation.province",
+    "pk": 1,
+    "fields": {
+      "name": "آذربایجان شرقی",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 2,
+    "fields": {
+      "name": "آذربایجان غربی",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 3,
+    "fields": {
+      "name": "اردبیل",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 4,
+    "fields": {
+      "name": "اصفهان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 5,
+    "fields": {
+      "name": "البرز",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 6,
+    "fields": {
+      "name": "ایلام",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 7,
+    "fields": {
+      "name": "بوشهر",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 8,
+    "fields": {
+      "name": "تهران",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 9,
+    "fields": {
+      "name": "چهارمحال و بختیاری",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 10,
+    "fields": {
+      "name": "خراسان جنوبی",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 11,
+    "fields": {
+      "name": "خراسان رضوی",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 12,
+    "fields": {
+      "name": "خراسان شمالی",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 13,
+    "fields": {
+      "name": "خوزستان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 14,
+    "fields": {
+      "name": "زنجان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 15,
+    "fields": {
+      "name": "سمنان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 16,
+    "fields": {
+      "name": "سیستان و بلوچستان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 17,
+    "fields": {
+      "name": "فارس",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 18,
+    "fields": {
+      "name": "قزوین",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 19,
+    "fields": {
+      "name": "قم",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 20,
+    "fields": {
+      "name": "کردستان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 21,
+    "fields": {
+      "name": "کرمان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 22,
+    "fields": {
+      "name": "کرمانشاه",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 23,
+    "fields": {
+      "name": "کهگیلویه و بویراحمد",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 24,
+    "fields": {
+      "name": "گلستان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 25,
+    "fields": {
+      "name": "لرستان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 26,
+    "fields": {
+      "name": "گیلان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 27,
+    "fields": {
+      "name": "مازندران",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 28,
+    "fields": {
+      "name": "مرکزی",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 29,
+    "fields": {
+      "name": "هرمزگان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 30,
+    "fields": {
+      "name": "همدان",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  },
+  {
+    "model": "transportation.province",
+    "pk": 31,
+    "fields": {
+      "name": "یزد",
+      "created": "2022-06-15T05:44:07.461Z",
+      "updated": "2022-06-15T05:44:07.461Z"
+    }
+  }
+]

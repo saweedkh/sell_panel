@@ -1,0 +1,24 @@
+{% extends "account/dashboard/base.html" %}
+
+{% load crispy_forms_filters %}
+{% load humanize %}
+{% load utils %}
+{% load static %}
+{% load i18n %}
+
+
+{% block breadcrumb_section %}
+<!-- breadcrumb_section - start
+================================================== -->
+{% trans "جزئیات سفارش" as page_name %}
+{% trans "رابط کاربری" as title %}
+{% include "inc/fa-breadcrumb_section.html" with page_name=page_name title=title %}
+
+<!-- breadcrumb_section - end
+================================================== -->
+{% endblock breadcrumb_section %}
+
+
+{% block dashboard %}
+    {% include "order/cart/detail-cart.html" with class='col-lg-8' %}
+{% endblock dashboard %}

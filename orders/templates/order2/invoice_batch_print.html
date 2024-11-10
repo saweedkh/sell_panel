@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load utils %}
+{% load humanize %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans 'صورت حساب' %} {{ invoice.tracking_code }}{% endblock %}
+
+{% block custom_css %}
+    <style>
+        @media print {
+            @page {
+                margin: 0;
+            }
+            .invoice-page {
+                page-break-after: always;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="button-group-invoice">
+        <button id="print_invoice" class="btn theme-bg-color text-white rounded no-print-this">
+            {% trans 'دانلود / پرینت' %}
+        </button>
+    </div>
+    <div id="printable">
+        {% for invoice in invoices %}
+            {% with invoice.invoiceitem_set.all as invoice_items %}
+                <section class="theme-invoice-1 invoice-page" dir="rtl">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-xxl-6 col-xl-8 mx-auto my-3">
+                                <div class="invoice-wrapper">
+                                    <div class="invoice-header">
+                                        <div class="header-image">
+                                            {% if global_settings.logo and global_settings.logo.file %}
+                                                <img src="{{ global_settings.get_logo }}"
+                                                     class="logo_in_invoice img-fluid"
+                                                     alt="logo">
+                                            {% else %}
+                                                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKUAAABICAQAAAA9+P0NAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QA/4ePzL8AAAAHdElNRQfmBBwGDDv6tcZCAAAAAW9yTlQBz6J3mgAAAnlJREFUeNrtnN16gyAMhk2f3f8ts5PZTgzyJYSYSt6TTqX8fAsJRimVLbHh5+4OuLLbDVXHnzMD0DJWeRwosWeGeN09QidK59iAFSa408TbpdQ295kWpn7HEDcP9hpsrlSfrp0X9K9mwr97FV/pwLN9JW+TkxzQk6XkhJzox2dM8Fhhx61no1JS9bmskPwE1zUZTcJ6ek/vX0ZwM1JKM1aR0sH9rCKlAymlGXZLdDydgcVWzZ1Kga8QVAvaGm2bnVWi6YzCXC1Qqd4VWRplvJbTiD1vHLFO9kuVzWsVWyTt+PlKKyFl5RzxktJWSGlZF3yktBdSU34yHlL2hkxQqX7NEv85wddyYac/KElHsEcC/VJ8iWNgoMMVbY+V6CK4KLIxYN+m01GwKX1k9gTHMtlovpvA796C940jqSwSu3Izc6XURm6ZXEHs0tcqRy1SUos7OimDDuZe7J7t9EHrDTJhpWS+0oyU0oyU0oyU0oyU0ownSBlkaRbxTbYg0kh5glUGIYKUtRVGWqIX/HwEKfEB7FeLo9wFPBdESi4L2cqacxsJ5gLu+YkhZWsIpXM8Ay7oQS9MRIng1LTCGAD9iGOVcZZAyp7EkfLrxYwkpXQIM6VX1B1LSskQZtuwuP7XeBXGXcOeSXo4A2Eb+9b68X2zfA36esc3evbbRnrXekZ/evtjnV8psOYkZTRf+cWklGaklGZEuXGMRf0jOhBplWcK81e7zJuUska9pEkprxHkq1LKHsiWLdq2XKJzXL2DfLFdMCM4xpXF/cmcE/zMA1K/cVDtAEopefCU4JuUsoU4a5oR/Aog2Pw7kVJ2gH+OLKU0I32lGSmlGb9GK3+MPt2PFgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0wNC0yOFQwNjoxMjoyMiswMDowMNyva2wAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMDQtMjhUMDY6MTI6MjIrMDA6MDCt8tPQAAAAAElFTkSuQmCC"
+                                                     class="default_logo_in_invoice img-fluid" alt="logo">
+                                            {% endif %}
+                                        </div>
+                                        <div class="header-content">
+                                            <h2 class="mb-0 mt-n2">{{ global_settings.name }}</h2>
+                                            <p class="color-highlight mt-n1 text-center">{{ site_url }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="invoice-body">
+                                        <div class="invoice-table">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>{% trans 'شماره سفارش' %}</th>
+                                                        <th>{% trans 'زمان ثبت سفارش' %}</th>
+                                                        <th>{% trans 'روش پرداخت' %}</th>
+                                                        <th>{% trans 'روش ارسال' %}</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>{{ invoice.tracking_code }}</td>
+                                                        <td>{{ invoice.order_created|standard_jalali }}</td>
+                                                        <td>{{ invoice.payment_method }}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="top-sec">
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="details-box">
+                                                        {% with sender.get_fields as fields %}
+                                                            {% if fields.show_section %}
+                                                                <div class="address-box">
+                                                                    <h5 class="col-12 fw-bold">{% trans 'اطلاعات فرستنده' %}</h5>
+                                                                    <hr>
+                                                                    <ul>
+                                                                        <li>
+                                                                            <span>{% trans 'شماره تلفن' %}: </span><span
+                                                                                class="fix_number_direction">{{ fields.mobile_number }}</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <span>{% trans 'ایمیل' %}:</span>
+                                                                            <span>{{ fields.email }}</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <span>{% trans 'کد پستی' %}:</span>
+                                                                            <span>{{ fields.postal_code }}</span>
+                                                                        </li>
+                                                                        <li>
+                                                                            <span>{% trans 'آدرس' %}:</span>
+                                                                            <span class="d-inline">{{ fields.address }}</span>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endwith %}
+                                                        <div class="address-box">
+                                                            <h5 class="col-12 fw-bold">{% trans 'اطلاعات گیرنده' %}</h5>
+                                                            <hr>
+                                                            <ul>
+                                                                <li>
+                                                                    <span>{% trans 'نام' %}: </span>
+                                                                    <span>{{ invoice.fullname }}</span>
+                                                                </li>
+                                                                <li>
+                                                                    <span>{% trans 'شماره تلفن' %}:</span> <span
+                                                                        class="fix_number_direction">{{ invoice.mobile_number }}</span>
+                                                                </li>
+                                                                <li>
+                                                                    <span>{% trans 'آدرس' %}:</span>
+                                                                    <span>{{ invoice.complete_address }}</span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-table-2">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th class="text-start">{% trans 'محصول' %}</th>
+                                                        <th>{% trans 'شناسه' %}</th>
+                                                        <th>{% trans 'قیمت واحد' %}</th>
+                                                        <th>{% trans 'تعداد' %}</th>
+                                                        <th>{% trans 'جمع' %}</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for item in invoice_items %}
+                                                        <tr>
+                                                            <td>{{ forloop.counter }}</td>
+                                                            <td>{{ item.product }}</td>
+                                                            <td>{{ item.get_sku }}</td>
+                                                            <td>{{ item.price|intcomma:False }}</td>
+                                                            <td>{{ item.quantity }}</td>
+                                                            <td>{{ item.total_price|intcomma:False }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="price-box">
+                                            <ul>
+                                                <li>{% trans 'تعداد کل کالا ها' %}</li>
+                                                <li class="theme-color">{{ invoice.total_items_number }} {% trans 'عدد' %}</li>
+                                            </ul>
+                                            <ul>
+                                                <li>{% trans 'مجموع قیمت کالا ها' %}</li>
+                                                <li class="theme-color">{{ invoice.commodity_prices|intcomma:False }} {% trans 'تومان' %}</li>
+                                            </ul>
+
+                                            {% if invoice.total_discount and invoice.total_discount != '0' %}
+                                                <ul>
+                                                    <li>{% trans 'تخفیف کالا ها' %}</li>
+                                                    <li class="theme-color">{{ invoice.total_discount|intcomma:False }} {% trans 'تومان' %}</li>
+                                                </ul>
+                                            {% endif %}
+                                            {% if invoice.discount_amount and invoice.discount_amount != '0' %}
+                                                <ul>
+                                                    <li>{% trans 'مبلغ کوپن تخفیف' %}</li>
+                                                    <li class="theme-color">{{ invoice.discount_amount|intcomma:False }} {% trans 'تومان' %}</li>
+                                                </ul>
+                                            {% endif %}
+                                            <ul>
+                                                <li>{% trans 'هزینه ارسال' %}</li>
+                                                <li class="theme-color">
+                                                    {% if invoice.shipping_cost == 0 %}{% trans '-' %}{% else %}
+                                                        {{ invoice.shipping_cost|intcomma:False }}
+                                                        {% trans 'تومان' %}{% endif %}</li>
+                                            </ul>
+                                            <hr>
+                                            <ul>
+                                                <li>{% trans 'مبلغ پرداختی' %}</li>
+                                                <li class="theme-color">{{ invoice.payable|intcomma:False }} {% trans 'تومان' %}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% endblock %}
+
+
+{% block custom_js %}
+    <script src="{% static 'firefly/js/printThis.js' %}"></script>
+    <script src="{% static 'order/js/print.js' %}"></script>
+{% endblock %}

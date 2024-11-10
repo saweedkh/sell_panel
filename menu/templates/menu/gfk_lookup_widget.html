@@ -1,0 +1,74 @@
+{% load i18n %}
+
+<input class="vForeignKeyRawIdAdminField" id="id_{{ name }}" name="{{ name }}" value="{{ value }}" type="text"/>
+<a data-name="developers" data-app="menu" data-model="menuobject" class="dynamic_raw_id-clear-field"
+   style="display: inline-block; cursor: pointer;" title="حذف">
+    <img src="/static/admin/img/icon-deletelink.svg" alt="Clear" height="13" width="13">
+</a>
+<script type="text/javascript">
+    window.addEventListener("load", function () {
+        (function ($) {
+            $(document).ready(function () {
+                if ($("#id_content_type").length) {
+                    const content_type_id = $('#id_content_type').val();
+
+                    // add lookup icon
+                    $('input#id_object_id').after('<a id="lookup_id_object_id" class="related-lookup" href="#" ' +
+                        'style="margin-right: 3px; margin-left: unset; background: none; width: 13px; height: 13px; display: inline-block;cursor: pointer;">' +
+                        '<img src="/static/admin/img/search.svg" alt="Lookup" height="13" width="13"  style="display: block;"></a>');
+
+                    // hide object id field if is empty
+                    if (content_type_id === '')
+                        $('.form-row.field-object_id').hide();
+                    else {
+                        // change #id_object_id input href
+                        const element = $('#lookup_id_object_id');
+                        change_link(element);
+                        }
+
+                    $(document).on("change", "#id_content_type", function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        $('#id_object_id').val('')
+                        const content_type_id = $('#id_content_type').val();
+
+                        // show and hide object id field
+                        if (content_type_id === '')
+                            $('.form-row.field-object_id').hide();
+                        else {
+                            $('.form-row.field-object_id').show();
+                            const element = $('#lookup_id_object_id');
+                            change_link(element, e);
+                        }
+                    })
+                }
+            });
+
+            function change_link(element, event) {
+                $("#content_error_id").remove();
+
+                let urls = {{ urls|safe }};
+                let ct_field_name = "{{ ct_field_name }}";
+                const id = element.attr('id');
+                if (id.indexOf('-')) {
+                    ct_field_name = id.substring(0, id.lastIndexOf('-') + 1).replace('lookup_id_', '') + ct_field_name;
+                }
+                const selected = $('select[name="' + ct_field_name + '"]').find('option:selected');
+                const content_type_id = selected.val();
+                const content_type = selected.text();
+                if (!content_type) {
+                    $("input#id_object_id").before('<ul class="errorlist" id="content_error_id" ><li>{% translate "نوع محتوا نمیتواند خالی باشد." %}</li></ul>');
+                    return false;
+                }
+                if (!content_type_id) {
+                    return false;
+                }
+                element.attr('href', urls[content_type]);
+                presentRelatedObjectModalOnClickOn('a.related-lookup', true);
+            }
+
+        })(django.jQuery);
+    });
+
+</script>

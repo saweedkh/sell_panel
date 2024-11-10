@@ -1,0 +1,23 @@
+{% extends "fa_base.html" %}
+
+{% load crispy_forms_filters %}
+{% load humanize %}
+{% load utils %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}
+{{page_title}}
+{% endblock title %}
+
+{% block breadcrumb_section %}{% endblock breadcrumb_section %}
+
+{% block content %}
+<section class="contact_section sec_ptb_120 d-flex justify-content-center " style="margin-top: 100px">
+    <div class="row container" style="width: 1000px;">
+        {% include "order/cart/detail-cart.html" %}
+    </div>
+</section>
+
+{% endblock content %}
+
