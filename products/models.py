@@ -27,205 +27,6 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from smart_selects.db_fields import ChainedForeignKey
 
 
-class Category(AbstractBaseCategory, AbstractContentModel, AbstractBaseSeoModel, AbstractDateTimeModel):
-    short_description = models.TextField(
-        null=True,
-        blank=True,
-        verbose_name=_('توضیح کوتاه'),
-    )
-    image = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to='categories/%y/%m/%d/',
-        verbose_name=_('تصویر'),
-    )
-    image_thumbnail = ImageSpecField(
-        source='image',
-        processors=[ResizeToFill(500, 500)],
-        format='JPEG',
-        options={'quality': 60}
-    )
-    icon = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to='categories/icons/%y/%m/%d/',
-        verbose_name=_('آیکون'),
-    )
-    icon_thumbnail = ImageSpecField(
-        source='icon',
-        processors=[ResizeToFill(64, 64)],
-        format='JPEG',
-        options={'quality': 70}
-    )
-    show_in_homepage = models.BooleanField(
-        default=False,
-        verbose_name=_('نمایش در صفحه اصلی'),
-    )
-    default_sorting = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-        choices=ProductSortChoices.choices,
-        verbose_name=_('مرتب سازی پیشفرض'),
-    )
-    consider_before_buying = RichTextUploadingField(
-        null=True,
-        blank=True,
-        verbose_name=_('نکات قبل از خرید محصولات این دسته بندی'),
-    )
-    show_consider_before_buying_in_category_page = models.BooleanField(
-        default=False,
-        verbose_name=_('نکات قبل از خرید محصولات این دسته بندی'),
-    )
-
-    class MPTTMeta:
-        order_insertion_by = ('created',)
-        unique_together = ('slug', 'parent',)
-
-    class Meta:
-        verbose_name = _('دسته بندی')
-        verbose_name_plural = _("دسته بندی ها")
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('products:category', kwargs={'path': self.get_path()})
-
-    @property
-    def default_search_engine_title(self):
-        return self.name
-
-    @property
-    def default_search_engine_description(self):
-        return None
-
-    @property
-    def default_search_engine_keywords(self):
-        return None
-
-    @property
-    def get_image(self):
-        try:
-            if self.image.url and self.image_thumbnail.url and self.image.file:
-                image = self.image_thumbnail.url
-        except:
-            image = static('defaults/default.png')
-        return image
-    
-    @property
-    def get_api_image(self):
-        try:
-            if self.image.url and self.image_thumbnail.url and self.image.file:
-                image = self.image_thumbnail.url
-        except:
-            image = None
-        return image
-
-    @property
-    def get_icon(self):
-        try:
-            if self.icon.url and self.icon_thumbnail.url and self.icon.file:
-                icon = self.icon_thumbnail.url
-        except:
-            icon = static('defaults/default.png')
-        return icon
-    
-    
-    @property
-    def get_api_icon(self):
-        try:
-            if self.icon.url and self.icon_thumbnail.url and self.icon.file:
-                icon = self.icon_thumbnail.url
-        except:
-            icon = None
-        return icon
-
-
-
-class ProductList(AbstractBaseCategory, AbstractContentModel, AbstractBaseSeoModel, AbstractDateTimeModel):
-    product_category = models.ForeignKey(
-        'Category',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        verbose_name=_('دسته بندی محصول'),
-    )
-    show_category_filter = models.BooleanField(
-        default=False,
-        verbose_name=_('نمایش فیلتر دسته بندی در صفحه'),
-    )
-    default_sorting = models.CharField(
-        max_length=50,
-        null=True,
-        blank=True,
-        choices=ProductSortChoices.choices,
-        verbose_name=_('مرتب سازی پیشفرض'),
-    )
-
-    class MPTTMeta:
-        order_insertion_by = ('created',)
-        unique_together = ('slug', 'parent',)
-
-    class Meta:
-        verbose_name = _('لیست محصول')
-        verbose_name_plural = _("لیست محصولات")
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse('products:list', args=[self.slug])
-
-    @property
-    def default_search_engine_title(self):
-        return self.name
-
-    @property
-    def default_search_engine_description(self):
-        return None
-
-    @property
-    def default_search_engine_keywords(self):
-        return None
-
-    def get_attribute_values(self):
-        attribute_value_ids = list()
-        list_filters = self.productlistfilter_set.all().prefetch_related('attribute_values', )
-        for list_filter in list_filters:
-            for attribute_value in list_filter.attribute_values.all().values_list('id', flat=True):
-                attribute_value_ids.append(attribute_value)
-        return list(set(attribute_value_ids))
-
-
-class ProductListFilter(AbstractDateTimeModel):
-    product_list = models.ForeignKey(
-        ProductList,
-        on_delete=models.CASCADE,
-        verbose_name=_('لیست محصول'),
-    )
-    attribute = models.ForeignKey(
-        'Attribute',
-        on_delete=models.CASCADE,
-        verbose_name=_('ویژگی'),
-    )
-    attribute_values = models.ManyToManyField(
-        'AttributeValue',
-        blank=True,
-        verbose_name=_('مقدار ویژگی ها'),
-    )
-    filterable = models.BooleanField(
-        default=True,
-        verbose_name=_('قابلیت فیلتر'),
-    )
-
-    class Meta:
-        verbose_name = _('فیلتر لیست محصول')
-        verbose_name_plural = _("فیلتر لیست محصولات")
-
-    def __str__(self):
-        return str(self.pk)
-
 
 class ProductQueryset(models.QuerySet):
 
@@ -244,10 +45,6 @@ class Product(ModelDiffMixin, AbstractContentModel, AbstractBaseSeoModel, Abstra
         (VARIABLE, _('متنوع')),
         (DOWNLOADABLE, _('دانلودی')),
         (VIRTUAL, _('مجازی')),
-    )
-    category = models.ManyToManyField(
-        Category,
-        verbose_name=_('دسته بندی'),
     )
     name = models.CharField(
         max_length=255,
@@ -589,31 +386,6 @@ class Product(ModelDiffMixin, AbstractContentModel, AbstractBaseSeoModel, Abstra
             id_list.extend(list(related_objects.values_list('id', flat=True)))
             remaining = num - related_objects.count()
 
-            if remaining > 0:
-                categories = self.category.all()
-
-                for category in categories:
-                    current_node = category
-
-                    while remaining > 0:
-                        objects = current_node.product_set.filter(
-                            in_stock=True,
-                            page_display_status=AbstractBaseSeoModel.PUBLISH
-                        ).order_by('?').exclude(id__in=id_list).distinct()
-                        id_list.extend(list(objects.values_list('id', flat=True)[:remaining]))
-                        result.extend(list(objects)[:remaining])
-                        remaining -= objects.count()
-
-                        if remaining <= 0:
-                            return result
-
-                        if current_node.is_root_node():
-                            break
-                        else:
-                            current_node = current_node.parent
-
-            else:
-                return result[:num]
 
             objects = Product.objects.filter(
                 in_stock=True,
@@ -641,11 +413,6 @@ class Product(ModelDiffMixin, AbstractContentModel, AbstractBaseSeoModel, Abstra
     def truncated_name(self):
         return ' '.join(self.name.split()[:3])
 
-    def get_specifications(self):
-        attributes = CategoryGeneralAttributes.objects.filter(
-            category__id__in=self.category.values_list('id', flat=True)
-        ).select_related('attribute', ).distinct()
-        return attributes
 
     @property
     def get_consider_before_buying(self):
@@ -1347,34 +1114,3 @@ class ProductSpecification(AbstractDateTimeModel):
     class Meta:
         verbose_name = _('مشخصات محصول')
         verbose_name_plural = _('مشخصات محصول')
-
-
-class CategoryGeneralAttributes(AbstractDateTimeModel):
-    RELATIONAL = 0
-    TEXTBOX = 1
-    TYPE_CHOICE = (
-        (RELATIONAL, _('مقدار مشخصه')),
-        (TEXTBOX, _('تکست باکس')),
-    )
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.CASCADE,
-        verbose_name=_('دسته بندی'),
-    )
-    attribute = models.ForeignKey(
-        Attribute,
-        on_delete=models.CASCADE,
-        verbose_name=_('ویژگی'),
-    )
-    filterable = models.BooleanField(
-        default=True,
-        verbose_name=_('قابلیت فیلتر'),
-    )
-
-    class Meta:
-        verbose_name = _('مشخصات دسته بندی')
-        verbose_name_plural = _('مشخصات دسته بندی')
-        unique_together = ('category', 'attribute',)
-
-    def __str__(self):
-        return self.attribute.name if self.attribute else f'{self.id}'

@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 # Local apps
 from utils.models import AbstractDateTimeModel
 from products.models import (
-    Category,
     Product,
 )
 
@@ -70,18 +69,6 @@ class DiscountCoupon(AbstractDateTimeModel):
         blank=True,
         related_name='exclude_products',
         verbose_name=_('به غیر از این محصولات'),
-    )
-    categories = models.ManyToManyField(
-        Category,
-        blank=True,
-        related_name='categories',
-        verbose_name=_('شامل این دسته بندی ها'),
-    )
-    exclude_categories = models.ManyToManyField(
-        Category,
-        blank=True,
-        related_name='exclude_categories',
-        verbose_name=_('به غیر از این دسته بندی ها'),
     )
    
     valid_from = models.DateTimeField(

@@ -7,11 +7,8 @@ from django.conf import settings
 # Local apps
 from .models import (
     Product,
-    ProductList,
-    ProductListFilter,
     ProductComment as Comment,
     ProductSpecification,
-    CategoryGeneralAttributes,
     Attribute,
 )
 from comment.forms import AnonymousBaseCommentForm, AuthenticatedBaseCommentForm, AuthenticatedBaseReplyForm, \
@@ -77,50 +74,6 @@ class ProductSpecificationInlineFormSet(forms.models.BaseInlineFormSet):
 
             if not attribute_values and not custom_attribute_value:
                 raise forms.ValidationError(_('مقدار و مقدار دلخواه ویژگی هردو نمی توانند خالی باشند.'))
-
-            if attribute and attribute_values:
-                for attribute_value in attribute_values:
-                    if attribute_value.attribute_id != attribute.pk:
-                        raise forms.ValidationError(
-                            _(f"مقدار ویژگی {attribute_value.name} به ویژگی {attribute} مربوط نیست")
-                        )
-
-        if len(attributes_list) != len(set(attributes_list)):
-            duplicated = [item for item, count in collections.Counter(attributes_list).items() if count > 1]
-            duplicated_attributes_name = ', '.join([attr_name.name for attr_name in duplicated])
-            raise forms.ValidationError(
-                _("ویژگی '{}' تکراری تعریف شده است.".format(duplicated_attributes_name, ))
-            )
-
-
-class ProductListAdminForm(forms.ModelForm):
-    class Meta:
-        model = ProductList
-        fields = '__all__'
-
-    def clean_show_category_filter(self):
-        cleaned_data = self.cleaned_data
-        product_category = cleaned_data.get("product_category")
-        show_category_filter = cleaned_data.get("show_category_filter")
-
-        if show_category_filter and not product_category:
-            raise forms.ValidationError(_('برای فعال سازی فیلتر ابتدا باید یک دسته بندی تعریف کنید.'))
-        return show_category_filter
-
-
-class ProductListFilterInlineFormSet(forms.models.BaseInlineFormSet):
-    model = ProductListFilter
-
-    def clean(self):
-        attributes_list = list()
-
-        for form in self.forms:
-            cd = form.cleaned_data
-            attribute = cd.get('attribute')
-            attribute_values = cd.get('attribute_values')
-
-            if attribute:
-                attributes_list.append(attribute)
 
             if attribute and attribute_values:
                 for attribute_value in attribute_values:

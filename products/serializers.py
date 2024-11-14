@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import Category, Gallery, Product, ProductComment, Variant
+from products.models import Gallery, Product, ProductComment, Variant
 
 
 class ProductSerializers(serializers.ModelSerializer):
@@ -8,7 +8,6 @@ class ProductSerializers(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
     default_variant = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
@@ -19,11 +18,8 @@ class ProductSerializers(serializers.ModelSerializer):
             'in_stock',
             'url',
             'default_variant',
-            'category',
         )
         
-    def get_category(self, obj):
-        return CategorySerializers(obj.category, many=True).data
         
     def get_image(self, obj):
         request = self.context.get('request')
@@ -37,9 +33,7 @@ class ProductSerializers(serializers.ModelSerializer):
     def get_default_variant(self, obj):
         request = self.context.get('request')
         return ProductVariantSerializers(obj.default_variant, context={'request': request}).data
-    
-    
-    
+
 class ProductVariantSerializers(serializers.ModelSerializer):
     
     name = serializers.SerializerMethodField()
@@ -74,62 +68,9 @@ class ProductVariantSerializers(serializers.ModelSerializer):
         request = self.context.get('request')
         if image := obj.get_image :
             return request.build_absolute_uri(image)
-        
-        
-        
-        
-class CategorySerializers(serializers.ModelSerializer):
-    class Meta: 
-            model = Category    
-            fields = (
-                'id',   
-                'name' ,
-            )
-        
-        
-class CategoryListSerializers(serializers.ModelSerializer):
     
-    image =serializers.SerializerMethodField()
-    icon = serializers.SerializerMethodField()
-    children = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Category
-        fields = (
-            'id',
-            'name',
-            'default_sorting',
-            'image',
-            'icon',
-            'show_in_homepage',
-            'consider_before_buying',
-            'show_consider_before_buying_in_category_page',
-            'children',
-            
-        )       
-        
-    def get_image(self, obj):
-        request = self.context.get('request')
-        if image := obj.get_api_image:
-            return request.build_absolute_uri(image)
-        
-    def get_icon(self, obj):
-        request = self.context.get('request')
-        if image := obj.get_api_icon:
-            return request.build_absolute_uri(image)
-        
-    def get_children(self, obj):
-        # ایجاد یک لیست از دسته‌بندی‌های فرزند
-        children = Category.objects.filter(parent=obj)
-        if children:
-            return CategoryListSerializers(children, many=True, context=self.context).data
-
-
-
-
 class ProductDetailSerializers(serializers.ModelSerializer):
     
-    category = serializers.SerializerMethodField()
     related_products = serializers.SerializerMethodField()
     structured_data = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
@@ -141,7 +82,6 @@ class ProductDetailSerializers(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = (
-            'category',
             'name',
             'extra_detail',
             'image',
@@ -160,9 +100,6 @@ class ProductDetailSerializers(serializers.ModelSerializer):
             'consider_before_buying',
             'structured_data',
         )
-        
-    def get_category(self, obj):
-        return CategorySerializers(obj.category, many=True).data
     
     def get_related_products(self, obj):
         return ProductSerializers(obj.get_related_products(), many=True, context=self.context).data
@@ -196,12 +133,7 @@ class ProductGallerySerializers(serializers.ModelSerializer):
         return obj.get_api_image
     
     def get_alt(self, obj):
-        return obj.get_alt()
-    
-    
-    
-    
-    
+        return obj.get_alt() 
 
 class ProductCommentSerializer(serializers.ModelSerializer):
     class Meta:

@@ -40,8 +40,6 @@ class DiscountCouponAdmin(DynamicRawIDMixin, admin.ModelAdmin):
     autocomplete_fields = (
         'products',
         'exclude_products',
-        'categories',
-        'exclude_categories',
     )
 
     class Media:

@@ -49,6 +49,7 @@ api_v1_urlpatterns = [
     path('area/', include('area.urls', namespace='area')),
     # Captcha
     path('captcha/', include('captcha.urls')),
+    
 
 ]
 

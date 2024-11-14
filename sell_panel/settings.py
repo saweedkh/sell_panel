@@ -28,6 +28,8 @@ SECRET_KEY = 'django-insecure-yevfh&1rt=-5bx9!b7#ox9#z&9r6gn&)-84%i(o1c1)f69k$2o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SITE_DOMAIN = '127.0.0.1'
+
 ALLOWED_HOSTS = []
 
 
@@ -53,7 +55,6 @@ INSTALLED_APPS = [
     'article',
     'blog',
     'setting',
-    'carts',
     'category',
     'coupon',
     'contact_us',
@@ -87,6 +88,7 @@ INSTALLED_APPS = [
     'adminsortable2',
     'captcha',
     'django_json_widget',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -301,6 +303,9 @@ CAPTCHA_LENGTH = 5
 CAPTCHA_NOISE_FUNCTIONS = ()
 CAPTCHA_LETTER_ROTATION = (-10, 10)
 
+
+# Chache Timeout
+DEFAULT_TIMEOUT = 3600
 
 # Override Local Setting
 try:

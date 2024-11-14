@@ -17,7 +17,6 @@ from account.models import (
 )
 from products.models import (
     Product,
-    Category,
     Variant,
     AttributeValue,
 )
@@ -586,13 +585,6 @@ class OrderItem(AbstractDateTimeModel):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_('محصول'),
-    )
-    product_category = models.ForeignKey(
-        Category,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        verbose_name=_('دسته بندی'),
     )
     variant = models.ForeignKey(
         Variant,

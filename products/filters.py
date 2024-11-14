@@ -5,12 +5,8 @@ from django.utils.translation import gettext_lazy as _
 # Local Apps
 from .models import (
     Product,
-    CategoryGeneralAttributes,
     AttributeValue,
     Brand,
-    Category,
-    ProductList,
-    ProductListFilter,
 )
 # Third Party Packages
 from django_filters import FilterSet
@@ -118,41 +114,6 @@ class ProductFilter(FilterSet):
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None, category=None, brand=None):
         super().__init__(data, queryset, request=request, prefix=prefix)
 
-        if category:
-            # Category Filter
-            children_of_category = category.get_children()
-            if children_of_category:
-                self.filters['category'] = CategoryMultipleChoiceFilter(
-                    label=_('دسته بندی'),
-                    widget=forms.CheckboxSelectMultiple,
-                    queryset=children_of_category,
-                )
-
-            # Category Attribute
-            category_general_attributes = CategoryGeneralAttributes.objects.filter(
-                category=category,
-                filterable=True,
-            ).select_related('attribute', )
-
-            for category_general_attribute in category_general_attributes:
-                self.filters[f'attr_{category_general_attribute.attribute_id}'] = AttributeMultipleChoiceFilterFilter(
-                    label=f'{category_general_attribute.attribute.name}',
-                    widget=forms.CheckboxSelectMultiple,
-                    queryset=AttributeValue.objects.filter(
-                        attribute=category_general_attribute.attribute,
-                        variant__product_id__in=queryset.values_list('id', flat=True)
-                    ).order_by('name', ).distinct()
-                )
-        else:
-            available_categories = Category.objects.filter(
-                product__id__in=queryset.values_list('id', flat=True)).distinct()
-
-            self.filters['category'] = CategoryMultipleChoiceFilter(
-                label=_('دسته بندی'),
-                widget=forms.CheckboxSelectMultiple,
-                queryset=available_categories,
-            )
-
         # Price Filter
         self.filters['price'] = PriceFilter(
             label=_('قیمت'),
@@ -211,20 +172,6 @@ class ProductListPageFilter(FilterSet):
                     widget=forms.CheckboxSelectMultiple,
                     queryset=children_of_category,
                 )
-
-        if product_list_page:
-            # Product List Page Attribute
-            try:
-                product_list = ProductList.objects.get(pk=product_list_page.pk)
-                general_attributes = product_list.productlistfilter_set.filter(filterable=True)
-                for general_attribute in general_attributes:
-                    self.filters[f'attr_{general_attribute.attribute.id}'] = AttributeMultipleChoiceFilterFilter(
-                        label=f'{general_attribute.attribute.name}',
-                        widget=forms.CheckboxSelectMultiple,
-                        queryset=general_attribute.attribute_values.all()
-                    )
-            except ProductList.DoesNotExist:
-                pass
 
         # Price Filter
         self.filters['price'] = PriceFilter(

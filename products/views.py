@@ -7,16 +7,13 @@ from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 
-from products.serializers import CategoryListSerializers, CategorySerializers, ProductCommentSerializer, ProductDetailSerializers, ProductSerializers
+from products.serializers import ProductCommentSerializer, ProductDetailSerializers, ProductSerializers
 
 # Locals apps
 from .filters import ProductFilter, ProductListPageFilter
 from .models import (
     Product,
     Variant,
-    Category,
-    ProductList,
-    ProductListFilter,
     ProductSpecification,
     ProductComment as Comment,
     Brand,
@@ -39,74 +36,6 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
-
-
-
-def categories(request):
-    categories = Category.objects.filter(page_display_status=Category.PUBLISH).annotate(product_count=Count('product'))
-    qs = Product.objects.published().all()
-    products = paginator(
-        request=request,
-        qs=qs,
-        per_page=ProductSettings.objects.get_first().paginator_number
-    )
-    context = {'categories': categories, 'products': products}
-    return render(request, 'product/categories.html', context)
-
-
-# def category(request, path, instance):
-#     if not instance:
-#         raise Http404
-#     _category = get_object_or_404(Category, slug=instance.slug, page_display_status=Category.PUBLISH)
-#     qs = Product.objects.published().filter(category=_category)
-#     product_filters = ProductFilter(request.GET, queryset=qs, category=_category)
-#     products = paginator(
-#         request=request,
-#         qs=sort_products(request.GET.get('sort'), _category.default_sorting, product_filters.qs),
-#         per_page=ProductSettings.objects.get_first().paginator_number
-#     )
-#     context = {'products': products, 'category': _category, 'product_filters': product_filters,
-#                'sort_options': ProductSortChoices}
-#     return render(request, 'product/category.html', context)
-
-
-def category(request, slug):
-    # if not instance:
-    #     raise Http404
-    _category = get_object_or_404(Category, slug=slug, page_display_status=Category.PUBLISH)
-    qs = Product.objects.published().filter(category=_category)
-    product_filters = ProductFilter(request.GET, queryset=qs, category=_category)
-    products = paginator(
-        request=request,
-        qs=sort_products(request.GET.get('sort'), _category.default_sorting, product_filters.qs),
-        per_page=ProductSettings.objects.get_first().paginator_number
-    )
-    categories = Category.objects.filter(page_display_status=Category.PUBLISH).annotate(product_count=Count('product'))
-    context = {'categories': categories, 'products': products, 'category': _category, 'product_filters': product_filters,
-               'sort_options': ProductSortChoices}
-    return render(request, 'product/category.html', context)
-
-
-
-def product_list(request, slug):
-    _product_list = get_object_or_404(ProductList, slug=slug, page_display_status=Category.PUBLISH)
-    qs = Product.objects.filter(
-        variant__attribute_values__id__in=_product_list.get_attribute_values()
-    ).distinct()
-    if _product_list.product_category:
-        qs = qs.filter(category=_product_list.product_category)
-    _product_filters = ProductListPageFilter(request.GET, queryset=qs, category=_product_list.product_category,
-                                             product_list_page=_product_list)
-    products = paginator(
-        request=request,
-        qs=sort_products(request.GET.get('sort'), _product_list.default_sorting, qs),
-        per_page=ProductSettings.objects.get_first().paginator_number
-    )
-    context = {'product_list': _product_list, 'products': products, 'product_filters': _product_filters,
-               'sort_options': ProductSortChoices}
-    return render(request, 'product/list.html', context)
-
 
 def brand(request, slug):
     _brand = get_object_or_404(Brand, slug=slug, page_display_status=Brand.PUBLISH)
@@ -246,17 +175,6 @@ def fill_related_products(request, product_id):
 class ProductView(ListAPIView):
     serializer_class = ProductSerializers
     queryset = Product.objects.published()
-    
-    
-    
-class CategoryListView(ListAPIView):
-    serializer_class = CategoryListSerializers
-    
-    
-    def get_queryset(self):
-        return  Category.objects.filter(parent__isnull=True, page_display_status=Category.PUBLISH)
-    
-    
 
 class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductDetailSerializers

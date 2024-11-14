@@ -13,14 +13,9 @@ from .forms import (
     VariantInlineFormset,
     RelatedProductInlineFormset,
     ProductSpecificationInlineFormSet,
-    ProductListAdminForm,
-    ProductListFilterInlineFormSet,
     AttributeInlineFormset,
 )
 from .models import (
-    Category,
-    ProductList,
-    ProductListFilter,
     Product,
     Variant,
     Attribute,
@@ -34,7 +29,6 @@ from .models import (
     Unit,
     ProductComment as Comment,
     ProductSettings as Settings,
-    CategoryGeneralAttributes,
     ProductSpecification,
 )
 from .resources import (
@@ -90,105 +84,6 @@ class ProductSpecificationInline(admin.TabularInline):
         if extra_count:
             extra = int(extra_count)
         return extra
-
-
-@admin.register(CategoryGeneralAttributes)
-class CategoryGeneralAttributesAdmin(admin.ModelAdmin):
-    fieldsets = (
-        (_('مشخصات دسته بندی'), {'fields': ('category', 'attribute', 'filterable',)}),
-        *DateTimeAdminMixin.fieldsets,
-    )
-    list_display = (
-        'category', 'attribute', 'filterable',
-        *DateTimeAdminMixin.list_display,
-    )
-    list_select_related = ('category', 'attribute',)
-    autocomplete_fields = ('category', 'attribute',)
-    search_fields = ('attribute',)
-    list_filter = ('category', 'attribute', 'filterable',)
-    readonly_fields = (*DateTimeAdminMixin.readonly_fields,)
-
-
-class CategoryGeneralAttributesInline(admin.TabularInline):
-    model = CategoryGeneralAttributes
-    extra = 0
-    autocomplete_fields = ('attribute',)
-    classes = ('collapse',)
-
-
-@admin.register(Category)
-class CategoryAdmin(AdminAutoSaveMixin, CategoryMPTTAdminMixin):
-    fieldsets = (
-        *CategoryMPTTAdminMixin.fieldsets,
-        (_('تنظیمات صفحه'), {'fields': ('default_sorting',)}),
-        # (_('توضیحات و تصویر'), {'fields': ('short_description', 'image', 'icon', 'show_in_homepage',)}),
-        (_('توضیحات و تصویر'), {'fields': ('image', 'icon', 'show_in_homepage',)}),
-        # *ContentAdminMixin.fieldsets,
-        (_('نکات قبل از خرید'), {
-            'classes': ('collapse',),
-            'fields': ('consider_before_buying', 'show_consider_before_buying_in_category_page',)
-        }),
-        *SeoAdminMixin.fieldsets,
-        *DateTimeAdminMixin.fieldsets,
-    )
-    readonly_fields = (*DateTimeAdminMixin.readonly_fields,)
-    list_display = (
-        *CategoryMPTTAdminMixin.list_display, *
-        SeoAdminMixin.list_display,
-        'total_sales',
-        *DateTimeAdminMixin.list_display,
-    )
-    list_filter = (*SeoAdminMixin.list_filter, 'show_in_homepage',)
-    search_fields = (*CategoryMPTTAdminMixin.search_fields,)
-    prepopulated_fields = {"slug": ("name",)}
-    # autocomplete_fields = (*CategoryMPTTAdminMixin.autocomplete_fields,)
-    dynamic_raw_id_fields = (*CategoryMPTTAdminMixin.dynamic_raw_id_fields,)
-    inlines = (CategoryGeneralAttributesInline, *SeoAdminMixin.inlines,)
-    actions = (*SeoAdminMixin.actions,)
-    date_hierarchy = DateTimeAdminMixin.date_hierarchy
-    save_on_top = True
-
-    @admin.display(description=_('مجموع فروش کالاها'), empty_value='-')
-    def total_sales(self, obj):
-        if obj:
-            return obj.product_set.aggregate(sales=Sum("variant__sales"))['sales']
-
-
-class ProductListFilterInline(admin.TabularInline):
-    model = ProductListFilter
-    fk_name = 'product_list'
-    fields = ('attribute', 'attribute_values', 'filterable',)
-    autocomplete_fields = ('attribute', 'attribute_values',)
-    extra = 0
-    classes = ('collapse',)
-    formset = ProductListFilterInlineFormSet
-
-
-@admin.register(ProductList)
-class ProductListAdmin(AdminAutoSaveMixin, CategoryMPTTAdminMixin):
-    form = ProductListAdminForm
-    fieldsets = (
-        (None, {'fields': ('product_category', 'show_category_filter', 'default_sorting',)}),
-        *CategoryMPTTAdminMixin.fieldsets,
-        *ContentAdminMixin.fieldsets,
-        *SeoAdminMixin.fieldsets,
-        *DateTimeAdminMixin.fieldsets,
-    )
-    readonly_fields = (*DateTimeAdminMixin.readonly_fields,)
-    list_display = (*CategoryMPTTAdminMixin.list_display, 'product_category', *SeoAdminMixin.list_display,
-                    *DateTimeAdminMixin.list_display,)
-    list_select_related = ('product_category',)
-    autocomplete_fields = ('product_category',)
-    list_filter = (*SeoAdminMixin.list_filter, 'product_category',)
-    search_fields = (*CategoryMPTTAdminMixin.search_fields,)
-    prepopulated_fields = {"slug": ("name",)}
-    # autocomplete_fields = (*CategoryMPTTAdminMixin.autocomplete_fields,)
-    dynamic_raw_id_fields = (*CategoryMPTTAdminMixin.dynamic_raw_id_fields,)
-    inlines = (ProductListFilterInline, *SeoAdminMixin.inlines,)
-    actions = (*SeoAdminMixin.actions,)
-    date_hierarchy = DateTimeAdminMixin.date_hierarchy
-    save_on_top = True
-
 
 class RelatedProductInline(SortableInlineAdminMixin, DynamicRawIDMixin, admin.TabularInline):
     formset = RelatedProductInlineFormset
@@ -290,7 +185,7 @@ class ProductAdmin(AdminAutoSaveMixin, SortableAdminBase, DynamicRawIDMixin, Exp
     form = ProductAdminForm
     fieldsets = (  
         (_('محصول'), {'fields': (
-            'category', 'name', 'extra_detail', 'type', 'attributes', 'brand', 'badge', 'unit', 'image',
+            'name', 'extra_detail', 'type', 'attributes', 'brand', 'badge', 'unit', 'image',
         )}),
         (_('انبارداری'), {
             'fields': ('inventory_management',),
@@ -312,12 +207,11 @@ class ProductAdmin(AdminAutoSaveMixin, SortableAdminBase, DynamicRawIDMixin, Exp
     list_filter = (
         *SeoAdminMixin.list_filter,
         'type', 'in_stock', 'inventory_management', 'badge', 'brand',
-        ('category', TreeRelatedFieldListFilter),
     )
     search_fields = ('name', 'variant__sku',)
     prepopulated_fields = {"slug": ("name",)}
-    autocomplete_fields = ('attributes', 'badge', 'unit',)
-    dynamic_raw_id_fields = ('category', 'brand',)
+    autocomplete_fields = ('attributes', 'badge', 'unit','brand',)
+    # dynamic_raw_id_fields = ('brand',)
     inlines = (ProductSpecificationInline, VariantInline, GalleryInline, RelatedProductInline,
               *SeoAdminMixin.inlines,)
     actions = (*SeoAdminMixin.actions, 'enable_inventory_management', 'disable_inventory_management',)
@@ -390,7 +284,6 @@ class WarehouseAdmin(NumericFilterModelAdmin, ImportExportActionModelAdmin):
         'without_order_limit',
         ('quantity', RangeNumericFilter),
         ('temp_quantity', RangeNumericFilter),
-        ('product__category', TreeRelatedFieldListFilter),
     )
     search_fields = ('product__name', 'warehouse_category__name',)
     autocomplete_fields = ('warehouse_category',)

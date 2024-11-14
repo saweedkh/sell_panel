@@ -33,6 +33,10 @@ class StaticPageAdminMixin(AdminAutoSaveMixin, admin.ModelAdmin):
     readonly_fields = (*DateTimeAdminMixin.readonly_fields, 'slug',)
     list_display = ('display_page_title', 'display_page_in_site', *SeoAdminMixin.list_display,)
     inlines = (*SeoAdminMixin.inlines,)
+    
+    class Media :
+        js = ('ckeditor/ckeditor/ckeditor.js', 
+              'ckeditor/ckeditor-init.js',)
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= 1:

@@ -12,7 +12,6 @@ from blog.models import (
 from utils.models import AbstractDateTimeModel
 from seo.models import AbstractBaseSeoModel, AbstractContentModel
 from category.models import AbstractBaseCategory
-from products.models import Category as ProductCategory
 from comment.models import AbstractBaseComment
 
 
@@ -28,20 +27,19 @@ class ArticlePost(AbstractBlogPost):
         (PREMIUM, _('آموزشی'))
 
     )
+    category = models.ForeignKey(
+        Category, 
+        on_delete=models.CASCADE,
+        verbose_name=_('دسته بندی'),
+        blank=True,
+        null=True,
+    )
     related_posts = models.ManyToManyField(
         'self',
         blank=True,
         through='ArticleRelatedPost',
         symmetrical=False,
         verbose_name=_('پست های مرتبط'),
-    )
-
-    category = models.ForeignKey(
-        ProductCategory,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        verbose_name=_('دسته بندی'),
     )
     premium_voice = models.FileField(
         verbose_name=_('صوت ویژه'),

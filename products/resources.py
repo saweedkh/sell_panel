@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from .models import (
     Product,
     Variant,
-    Category,
     Attribute,
     Brand,
     Badge,
@@ -22,11 +21,6 @@ class ProductResource(resources.ModelResource):
     id = fields.Field(
         column_name=_('شناسه'),
         attribute='id',
-    )
-    category = fields.Field(
-        column_name=_('دسته بندی'),
-        attribute='category',
-        widget=ManyToManyWidget(Category, separator='، ', field='name')
     )
     name = fields.Field(
         column_name=_('نام'),
