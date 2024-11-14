@@ -16,11 +16,8 @@ from django.http import (
 from gateways.models.banks import Bank
 from gateways.models.enum import PaymentStatus
 from orders.models import Invoice, Order
-from carts.cart import Cart
 from orders.serializers import OrderSerializer
 from payment.serializers import InvoiceSerializers
-from sms.sms import SendSMSWithPattern
-from sms.enum import OrderStatusSMS
 from .forms import ReceiptForm
 from .models import PaymentSetting
 from gateways import models as bank_models, default_settings as settings

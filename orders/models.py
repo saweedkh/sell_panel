@@ -176,7 +176,9 @@ class Order(ModelDiffMixin, AbstractDateTimeModel, AbstractUUIDModel):
     )
     province = models.CharField(
         max_length=200,
-        verbose_name=_('استان')
+        verbose_name=_('استان'),
+        blank=True,
+        null=True,
     )
     city_id = models.ForeignKey(
         City,
@@ -187,7 +189,9 @@ class Order(ModelDiffMixin, AbstractDateTimeModel, AbstractUUIDModel):
     )
     city = models.CharField(
         max_length=200,
-        verbose_name=_('شهر')
+        verbose_name=_('شهر'),
+        blank=True,
+        null=True,
     )
     address_id = models.ForeignKey(
         UserAddress,
@@ -198,6 +202,8 @@ class Order(ModelDiffMixin, AbstractDateTimeModel, AbstractUUIDModel):
     )
     address = models.TextField(
         verbose_name=_('آدرس'),
+        blank=True,
+        null=True,
     )
     postal_code = models.CharField(
         null=True,

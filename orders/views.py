@@ -23,7 +23,6 @@ from .utils import (
     get_user_agent,
 )
 # from account.forms import AddressForm
-from carts.cart import Cart
 from django.conf import settings
 
 

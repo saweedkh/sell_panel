@@ -15,7 +15,6 @@ from products.models import Product, ProductComment
 from products.forms import AuthenticatedCommentForm as ProductAuthenticatedCommentForm, \
     AnonymousCommentForm as ProductAnonymousCommentForm
 from accounts.models import User, Wishlist, Bookmark
-from carts.cart import Cart
 from transportation.models import Province
 from blog.models import Post, BlogComment
 from blog.forms import (

@@ -13,7 +13,6 @@ from comment.models import AbstractBaseComment
 from utils.models import AbstractDateTimeModel
 from category.models import AbstractBaseCategory
 from seo.models import AbstractBaseSeoModel, AbstractContentModel
-from carts.exceptions import CartException
 from setting.models import SiteGlobalSetting
 from .mixins import ModelDiffMixin
 from .utils import ProductSortChoices, make_automatic_description
