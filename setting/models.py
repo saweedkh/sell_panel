@@ -1,6 +1,7 @@
 # Django Built-in modules
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 # Local apps
 from utils.models import AbstractDateTimeModel
@@ -100,6 +101,21 @@ class SiteGlobalSetting(AbstractDateTimeModel):
         null=True,
         blank=True,
         verbose_name=_('دامنه X-UI'),
+        help_text=_('دامنه حتما باید با http یا https شروع شود.'),
+    )
+    xui_username = models.CharField(
+        _("نام کاربری X-UI"), 
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_('نام کاربری پنل x_ui خود را وارد کنید.'),
+    )
+    xui_password = models.CharField(
+        _("رمز عبور X-UI"),     
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_('رمز عبور پنل x_ui خود را وارد کنید.'),
     )
 
     class Meta:
@@ -132,6 +148,13 @@ class SiteGlobalSetting(AbstractDateTimeModel):
 
     def have_contact_ways(self):
         return self.phone or self.email
+    
+    def clean(self):
+        super().clean()
+        if self.xui_domain:
+            if not self.xui_domain.startswith('http'):
+                raise ValidationError(_('دامنه X-UI باید با http شروع شود.'))
+            self.xui_domain = self.xui_domain.rstrip('/')
 
 
 class SocialMediaSetting(AbstractDateTimeModel):
