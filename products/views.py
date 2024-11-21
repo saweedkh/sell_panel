@@ -35,7 +35,7 @@ from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 def brand(request, slug):
     _brand = get_object_or_404(Brand, slug=slug, page_display_status=Brand.PUBLISH)
@@ -175,9 +175,12 @@ def fill_related_products(request, product_id):
 class ProductView(ListAPIView):
     serializer_class = ProductSerializers
     queryset = Product.objects.published()
+    permission_classes = [AllowAny]
+
 
 class ProductDetailView(RetrieveAPIView):
     serializer_class = ProductDetailSerializers
+    permission_classes = [AllowAny]
     lookup_field = 'id'
     
     def get_queryset(self):

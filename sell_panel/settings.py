@@ -304,8 +304,12 @@ CAPTCHA_NOISE_FUNCTIONS = ()
 CAPTCHA_LETTER_ROTATION = (-10, 10)
 
 
-# Chache Timeout
+# Cache Timeout
 DEFAULT_TIMEOUT = 3600
+
+# phone number settings
+PHONENUMBER_DEFAULT_FORMAT = 'NATIONAL'
+PHONENUMBER_DEFAULT_REGION = 'IR'
 
 # Override Local Setting
 try:

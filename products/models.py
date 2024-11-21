@@ -67,7 +67,7 @@ class Product(ModelDiffMixin, AbstractContentModel, AbstractBaseSeoModel, Abstra
         source='image',
         processors=[ResizeToFill(350, 300)],
         format='JPEG',
-        options={'quality': 60}
+        options={'quality': 80}
     )
     type = models.PositiveSmallIntegerField(
         choices=PRODUCT_TYPE_STATUS_CHOICES,
@@ -659,99 +659,99 @@ class Variant(ModelDiffMixin, AbstractDateTimeModel):
                 image = static('defaults/default.png')
         return image
 
-    def validation_to_add_to_cart(self, quantity):
-        try:
-            try:
-                quantity = int(quantity)
-            except ValueError:
-                raise CartException(_('یک مقدار معتبر برای تعداد محصول وارد کنید.'))
-            if quantity < 1:
-                raise CartException(_('حداقل تعداد مجاز برای افزودن به سبد خرید برابر با ۱ است.'))
-            if not self.in_stock:
-                raise CartException(_('{0} موجود نیست.'.format(self.variant_descriptor)))
-            if not self.order_limit_max == 0 and self.order_limit_max < quantity:
-                if self.product.unit:
-                    raise CartException(
-                        _('سقف تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
-                            self.variant_descriptor, self.order_limit_max, self.product.unit.name)
-                        )
-                    )
-                else:
-                    raise CartException(
-                        _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
-                            self.variant_descriptor, self.order_limit_max)
-                        )
-                    )
-            if not self.order_limit_min <= 1 and self.order_limit_min > quantity:
-                if self.product.unit:
-                    raise CartException(
-                        _('حداقل تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
-                            self.variant_descriptor, self.order_limit_min, self.product.unit.name)
-                        )
-                    )
-                else:
-                    raise CartException(
-                        _('حداقل تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
-                            self.variant_descriptor, self.order_limit_min)
-                        )
-                    )
+    # def validation_to_add_to_cart(self, quantity):
+    #     try:
+    #         try:
+    #             quantity = int(quantity)
+    #         except ValueError:
+    #             raise CartException(_('یک مقدار معتبر برای تعداد محصول وارد کنید.'))
+    #         if quantity < 1:
+    #             raise CartException(_('حداقل تعداد مجاز برای افزودن به سبد خرید برابر با ۱ است.'))
+    #         if not self.in_stock:
+    #             raise CartException(_('{0} موجود نیست.'.format(self.variant_descriptor)))
+    #         if not self.order_limit_max == 0 and self.order_limit_max < quantity:
+    #             if self.product.unit:
+    #                 raise CartException(
+    #                     _('سقف تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
+    #                         self.variant_descriptor, self.order_limit_max, self.product.unit.name)
+    #                     )
+    #                 )
+    #             else:
+    #                 raise CartException(
+    #                     _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
+    #                         self.variant_descriptor, self.order_limit_max)
+    #                     )
+    #                 )
+    #         if not self.order_limit_min <= 1 and self.order_limit_min > quantity:
+    #             if self.product.unit:
+    #                 raise CartException(
+    #                     _('حداقل تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
+    #                         self.variant_descriptor, self.order_limit_min, self.product.unit.name)
+    #                     )
+    #                 )
+    #             else:
+    #                 raise CartException(
+    #                     _('حداقل تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
+    #                         self.variant_descriptor, self.order_limit_min)
+    #                     )
+    #                 )
 
-            try:
-                warehouse = self.warehouse
-            except Warehouse.DoesNotExist:
-                warehouse = None
-            if warehouse and not warehouse.without_order_limit and quantity > warehouse.quantity:
-                if warehouse.quantity <= 0:
-                    raise CartException(
-                        _('{} در انبار موجود نیست.'.format(self.variant_descriptor))
-                    )
-                raise CartException(
-                    _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(self.variant_descriptor, warehouse.quantity))
-                )
-        except CartException as exception:
-            raise exception
+    #         try:
+    #             warehouse = self.warehouse
+    #         except Warehouse.DoesNotExist:
+    #             warehouse = None
+    #         if warehouse and not warehouse.without_order_limit and quantity > warehouse.quantity:
+    #             if warehouse.quantity <= 0:
+    #                 raise CartException(
+    #                     _('{} در انبار موجود نیست.'.format(self.variant_descriptor))
+    #                 )
+    #             raise CartException(
+    #                 _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(self.variant_descriptor, warehouse.quantity))
+    #             )
+    #     except CartException as exception:
+    #         raise exception
 
-    def validation_before_payment(self, quantity):
-        msg = None
-        try:
-            if not self.in_stock:
-                msg = _('{0} موجود نیست.'.format(self.variant_descriptor))
+    # def validation_before_payment(self, quantity):
+    #     msg = None
+    #     try:
+    #         if not self.in_stock:
+    #             msg = _('{0} موجود نیست.'.format(self.variant_descriptor))
 
-            if not self.order_limit_max == 0 and self.order_limit_max < quantity:
-                if self.product.unit:
-                    msg = _('سقف تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
-                        self.variant_descriptor, self.order_limit_max, self.product.unit.name)
-                    )
-                else:
-                    msg = _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
-                        self.variant_descriptor, self.order_limit_max)
-                    )
+    #         if not self.order_limit_max == 0 and self.order_limit_max < quantity:
+    #             if self.product.unit:
+    #                 msg = _('سقف تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
+    #                     self.variant_descriptor, self.order_limit_max, self.product.unit.name)
+    #                 )
+    #             else:
+    #                 msg = _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
+    #                     self.variant_descriptor, self.order_limit_max)
+    #                 )
 
-            if not self.order_limit_min <= 1 and self.order_limit_min > quantity:
-                if self.product.unit:
-                    msg = _('حداقل تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
-                        self.variant_descriptor, self.order_limit_min, self.product.unit.name)
-                    )
-                else:
-                    msg = _('حداقل تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
-                        self.variant_descriptor, self.order_limit_min)
-                    )
+    #         if not self.order_limit_min <= 1 and self.order_limit_min > quantity:
+    #             if self.product.unit:
+    #                 msg = _('حداقل تعداد سفارش برای {0}، {1} {2} می باشد.'.format(
+    #                     self.variant_descriptor, self.order_limit_min, self.product.unit.name)
+    #                 )
+    #             else:
+    #                 msg = _('حداقل تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
+    #                     self.variant_descriptor, self.order_limit_min)
+    #                 )
 
-            try:
-                warehouse = self.warehouse
-            except Warehouse.DoesNotExist:
-                warehouse = None
-            if warehouse and not warehouse.without_order_limit and quantity > warehouse.quantity:
-                if warehouse.quantity <= 0:
-                    msg = _('{} در انبار موجود نیست.'.format(self.variant_descriptor))
-                else:
-                    msg = _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
-                        self.variant_descriptor, warehouse.quantity))
+    #         try:
+    #             warehouse = self.warehouse
+    #         except Warehouse.DoesNotExist:
+    #             warehouse = None
+    #         if warehouse and not warehouse.without_order_limit and quantity > warehouse.quantity:
+    #             if warehouse.quantity <= 0:
+    #                 msg = _('{} در انبار موجود نیست.'.format(self.variant_descriptor))
+    #             else:
+    #                 msg = _('سقف تعداد سفارش برای {0}، {1} عدد می باشد.'.format(
+    #                     self.variant_descriptor, warehouse.quantity))
 
-        except CartException as exception:
-            raise exception
+    #     except CartException as exception:
+    #         raise exception
 
-        return msg
+    #     return msg
 
 
 class WarehouseCategory(AbstractDateTimeModel):

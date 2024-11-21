@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import Gallery, Product, ProductComment, Variant
+from products.models import Attribute, AttributeValue, Gallery, Product, ProductComment, Variant
 
 
 class ProductSerializers(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class ProductVariantSerializers(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     final_price = serializers.SerializerMethodField()
     discount_percent = serializers.SerializerMethodField()
-    
+    attribute_values = serializers.SerializerMethodField()
     class Meta: 
         model = Variant
         fields = (
@@ -49,6 +49,7 @@ class ProductVariantSerializers(serializers.ModelSerializer):
             'price',
             'final_price',
             'discount_percent',
+            'attribute_values',
             'in_stock',
             'order_limit_max',
             'order_limit_min',
@@ -69,6 +70,9 @@ class ProductVariantSerializers(serializers.ModelSerializer):
         if image := obj.get_image :
             return request.build_absolute_uri(image)
     
+    def get_attribute_values(self, obj):
+        return ProductAttributeValuesSerializers(obj.attribute_values, many=True).data
+    
 class ProductDetailSerializers(serializers.ModelSerializer):
     
     related_products = serializers.SerializerMethodField()
@@ -76,7 +80,7 @@ class ProductDetailSerializers(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     variants = serializers.SerializerMethodField()
     gallery = serializers.SerializerMethodField()
-    # attributes = serializers.SerializerMethodField()
+    attributes = serializers.SerializerMethodField()
     
     
     class Meta:
@@ -108,14 +112,27 @@ class ProductDetailSerializers(serializers.ModelSerializer):
         return obj.structured_data
     
     def get_image(self, obj):
-        return obj.get_api_image
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.get_api_image)
     
     def get_gallery(self, obj):
-        return ProductGallerySerializers(obj.gallery.all(), many=True).data
+        return ProductGallerySerializers(obj.gallery.all(), many=True, context=self.context).data
 
     def get_variants(self, obj):
-        return ProductVariantSerializers(obj.variant_set.all(), many=True).data
+        return ProductVariantSerializers(obj.variant_set.all(), many=True, context=self.context).data
+    
+    def get_attributes(self, obj):
+        return ProductAttributeSerializers(obj.attributes, many=True, context=self.context).data
 
+class ProductAttributeSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Attribute
+        fields = ('id', 'name', )
+
+class ProductAttributeValuesSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeValue
+        fields = ('id', 'attribute_name', 'name', )
 
 class ProductGallerySerializers(serializers.ModelSerializer):
     
@@ -130,7 +147,8 @@ class ProductGallerySerializers(serializers.ModelSerializer):
         )
         
     def get_image(self, obj):
-        return obj.get_api_image
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.get_api_image)
     
     def get_alt(self, obj):
         return obj.get_alt() 

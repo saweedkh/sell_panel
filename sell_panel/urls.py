@@ -51,6 +51,8 @@ api_v1_urlpatterns = [
     path('captcha/', include('captcha.urls')),
     # Orders
     path('orders/', include('orders.urls', namespace='orders')),    
+    # Payment
+    path('payment/', include('payment.urls', namespace='payment')),
     
 
 ]

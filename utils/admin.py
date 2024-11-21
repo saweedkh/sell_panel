@@ -26,7 +26,7 @@ class StaticPageAdminMixin(AdminAutoSaveMixin, admin.ModelAdmin):
     fieldsets = (
         (_('محتوا'), {'fields': (
             'content',
-        )}),
+        ),}),
         *SeoAdminMixin.fieldsets,
         *DateTimeAdminMixin.fieldsets,
     )
