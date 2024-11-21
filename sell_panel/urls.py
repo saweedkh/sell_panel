@@ -53,6 +53,8 @@ api_v1_urlpatterns = [
     path('orders/', include('orders.urls', namespace='orders')),    
     # Payment
     path('payment/', include('payment.urls', namespace='payment')),
+    # X_UI
+    path('x-ui/', include('x_ui.urls', namespace='x_ui')),       
     
 
 ]

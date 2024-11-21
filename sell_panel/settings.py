@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'smart_selects',
     'autosave',
     'notification',
+    'x_ui',
     
     
     # Third Party Apps
