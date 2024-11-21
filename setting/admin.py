@@ -20,7 +20,7 @@ from modeltranslation.admin import TranslationAdmin, TranslationInlineModelAdmin
 class SiteGlobalSettingAdmin(TabbedTranslationAdmin):
     fieldsets = (
         (_('عمومی'), {'fields': (
-            'name', 'slogan', 'copyright',
+            'name', 'xui_domain', 'slogan', 'copyright',
         )}),
         (_('لوگو و فاوآیکون'), {'fields': (
             'logo', 'favicon',

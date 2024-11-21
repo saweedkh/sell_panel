@@ -95,6 +95,12 @@ class SiteGlobalSetting(AbstractDateTimeModel):
         blank=True,
         verbose_name=_('بزرگنمایی'),
     )
+    xui_domain = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        verbose_name=_('دامنه X-UI'),
+    )
 
     class Meta:
         verbose_name = _('پیکربندی سایت')
